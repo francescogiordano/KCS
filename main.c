@@ -178,6 +178,7 @@ volatile uint8_t g_power_down = 0;	// 1 = Sleep after max_counter, 0 = Sleep aft
 
 volatile uint8_t CharDiagInfoData[6];
 volatile uint8_t CharFirmVerData[3] = { DEVICE_FIRMWARE_VERSION_MAJOR, DEVICE_FIRMWARE_VERSION_MINOR, DEVICE_FIRMWARE_VERSION_REVISION };
+volatile uint8_t CharRockNumData[3] = { 0x22,0x11,0x22 };
 
 //Function Prototypes
 void mcuSystemOff(void);
@@ -187,15 +188,32 @@ static void advertising_init(void) {	// init advertising data with type of servi
 	ble_advdata_t advdata;
 	ble_advdata_t scanrsp;
 
+	ble_advdata_manuf_data_t manuf_data; // Variable to hold manufacturer specific data
+	ble_advdata_service_data_t service_data;
 	ble_uuid_t adv_uuids[] = { { BLE_UUID_SERVICE_SENSORS, BLE_UUID_TYPE_BLE },{ BLE_UUID_SERVICE_DIAG, BLE_UUID_TYPE_BLE } };
+	
+	
+	uint8_t data[] = "SomeData!"; // Our data to adverise
+	manuf_data.company_identifier = 0x0059; // Nordics company ID
+	manuf_data.data.p_data = data;
+	manuf_data.data.size = sizeof(data);
+
+	uint8_t data2[] = "Sata"; // Our data to adverise
+	service_data.service_uuid = 0x2F99;
+	service_data.data.p_data = data2;
+	service_data.data.size = sizeof(data2);
 
 	// Build and set advertising data
 	memset(&advdata, 0, sizeof(advdata));
 
-	advdata.name_type = BLE_ADVDATA_FULL_NAME;
+	advdata.name_type = BLE_ADVDATA_SHORT_NAME;
+	advdata.short_name_len = 6;
 	advdata.include_appearance = true;
 	advdata.flags = BLE_GAP_ADV_FLAGS_LE_ONLY_LIMITED_DISC_MODE;
-
+	advdata.p_service_data_array = &service_data;
+	advdata.service_data_count = 1;
+	//advdata.p_manuf_specific_data = &manuf_data;
+	
 
 	memset(&scanrsp, 0, sizeof(scanrsp));
 	scanrsp.uuids_complete.uuid_cnt = sizeof(adv_uuids) / sizeof(adv_uuids[0]);

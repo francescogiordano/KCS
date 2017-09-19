@@ -10,9 +10,6 @@
 #include "mlx90393.h"
 #include "adxl362.h"
 
-#define SENSOR_COL_SIZE						20
-#define SENSOR_ROW_SIZE						20
-
 #define EN_SPI_ADXL362		g_spi_cs_pin = (ADXL362_SPI_CS)
 #define EN_SPI_LSM6DSL		g_spi_cs_pin = (LSM6DSL_SPI_CS)
 #define EN_SPI_MLX90393		g_spi_cs_pin = (MLX90393_SPI_CS)
@@ -23,6 +20,7 @@
 
 extern volatile uint8_t CharDiagInfoData[6];
 extern volatile uint8_t CharFirmVerData[3];
+extern volatile uint8_t CharRockNumData[3];
 
 bool getAccelData(uint8_t* );
 bool getGyroData(uint8_t* );

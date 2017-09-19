@@ -46,6 +46,7 @@ uint32_t initServiceSensors(ble_pss_t * p_pss, const ble_pss_init_t * p_pss_init
 	err_code = addCharSensorsWrite(p_pss, p_pss_init);
 	err_code = addCharDiagInfo(p_pss, p_pss_init);
 	err_code = addCharFirmVer(p_pss, p_pss_init);
+	err_code = addCharRockNum(p_pss, p_pss_init);
 
 	return err_code;
 }
@@ -93,9 +94,9 @@ static uint32_t addCharSensorsData(ble_pss_t * p_pss, const ble_pss_init_t * p_p
     memset(&attr_char_value, 0, sizeof(attr_char_value));
     attr_char_value.p_uuid       = &ble_uuid;
     attr_char_value.p_attr_md    = &attr_md;
-    attr_char_value.init_len     = (SENSOR_ROW_SIZE);
+    attr_char_value.init_len     = (CHAR_SENSORS_DATA_VER_LEN);
     attr_char_value.init_offs    = 0;
-    attr_char_value.max_len      = (SENSOR_ROW_SIZE);
+    attr_char_value.max_len      = (CHAR_SENSORS_DATA_VER_LEN);
     attr_char_value.p_value      = NULL;
 
     return sd_ble_gatts_characteristic_add(p_pss->service_handle, &char_md, &attr_char_value, &p_pss->char_sensor_data_handle);
@@ -143,13 +144,12 @@ static uint32_t addCharSensorsWrite(ble_pss_t * p_pss, const ble_pss_init_t * p_
 	memset(&attr_char_value, 0, sizeof(attr_char_value));
 	attr_char_value.p_uuid		= &ble_uuid;
 	attr_char_value.p_attr_md	= &attr_md;
-	attr_char_value.init_len	= (SENSOR_ROW_SIZE);
+	attr_char_value.init_len	= (CHAR_SENSORS_DATA_VER_LEN);
 	attr_char_value.init_offs	= 0;
-	attr_char_value.max_len		= (SENSOR_ROW_SIZE);
+	attr_char_value.max_len		= (CHAR_SENSORS_DATA_VER_LEN);
 	attr_char_value.p_value		= NULL;
 
 	return sd_ble_gatts_characteristic_add(p_pss->service_handle, &char_md, &attr_char_value, &p_pss->char_sensor_write_handle);
-	//return sd_ble_gatts_characteristic_add(p_pss->service_handle, &char_md, &attr_char_value, &p_pss->phy_sen_level_handles);
 }
 static uint32_t addCharDiagInfo(ble_pss_t * p_pss, const ble_pss_init_t * p_pss_init) {
 	
@@ -249,6 +249,55 @@ static uint32_t addCharFirmVer(ble_pss_t * p_pss, const ble_pss_init_t * p_pss_i
 
 	return sd_ble_gatts_characteristic_add(p_pss->service_handle, &char_md, &attr_char_value, &p_pss->char_firm_ver_handle);
 }
+static uint32_t addCharRockNum(ble_pss_t * p_pss, const ble_pss_init_t * p_pss_init) {
+	
+	ble_uuid_t          ble_uuid;
+	ble_gatts_char_md_t char_md;
+	ble_gatts_attr_md_t attr_md;
+	ble_gatts_attr_md_t p_user_desc_md;
+	ble_gatts_attr_md_t cccd_md;
+	ble_gatts_attr_t    attr_char_value;
+
+	char user_desc[] = "Rock Number";
+
+	memset(&cccd_md, 0, sizeof(cccd_md));
+	BLE_GAP_CONN_SEC_MODE_SET_OPEN(&cccd_md.read_perm);
+	BLE_GAP_CONN_SEC_MODE_SET_OPEN(&cccd_md.write_perm);
+	cccd_md.vloc = BLE_GATTS_VLOC_STACK;
+
+	memset(&char_md, 0, sizeof(char_md));
+	char_md.char_props.read = 1;
+	char_md.char_props.write = 1;
+	char_md.p_char_user_desc = (uint8_t *)user_desc;
+	char_md.char_user_desc_size = strlen(user_desc);
+	char_md.char_user_desc_max_size = strlen(user_desc);
+	char_md.p_char_pf = NULL;
+	char_md.p_user_desc_md = NULL;
+	char_md.p_cccd_md = &cccd_md;
+	char_md.p_sccd_md = NULL;
+
+	ble_uuid.type = p_pss->uuid_type;
+	ble_uuid.uuid = BLE_UUID_CHAR_ROCK_NUMBER;
+
+	memset(&attr_md, 0, sizeof(attr_md));
+	BLE_GAP_CONN_SEC_MODE_SET_OPEN(&attr_md.read_perm);
+	BLE_GAP_CONN_SEC_MODE_SET_OPEN(&attr_md.write_perm);
+	attr_md.vloc = BLE_GATTS_VLOC_STACK;
+	attr_md.rd_auth = 1;
+	attr_md.wr_auth = 1;
+	attr_md.vlen = 0;
+
+	uint8_t value[CHAR_ROCK_NUM_LEN];
+	memset(&attr_char_value, 0, sizeof(attr_char_value));
+	attr_char_value.p_uuid = &ble_uuid;
+	attr_char_value.p_attr_md = &attr_md;
+	attr_char_value.init_len = (CHAR_ROCK_NUM_LEN);
+	attr_char_value.init_offs = 0;
+	attr_char_value.max_len = (CHAR_ROCK_NUM_LEN);
+	attr_char_value.p_value = value;
+
+	return sd_ble_gatts_characteristic_add(p_pss->service_handle, &char_md, &attr_char_value, &p_pss->char_rock_num_handle);
+}
 
 
 void onBleEvenPHYSEN(ble_pss_t* p_pss, ble_evt_t* p_ble_evt) {	// call functions for appropriate ble events
@@ -325,16 +374,27 @@ static void onEvtRW(ble_pss_t* p_pss, ble_evt_t* p_ble_evt) {		// handle write e
 
 		//Reading CharDiagInfo
 		if (p_evt_rw_auth_req->request.read.handle == p_pss->char_diag_info_handle.value_handle) {
-			sendDiagInfo(p_pss);
-			charDiagInfoRWAuthReply(p_pss);
+			//sendDiagInfo(p_pss);
+			charDiagInfoReadAuthReply(p_pss);
 		}
 		
 		//Reading CharFirmVer
 		if (p_evt_rw_auth_req->request.read.handle == p_pss->char_firm_ver_handle.value_handle) {
-			charFirmwVerRWAuthReply(p_pss);
+			charFirmwVerReadAuthReply(p_pss);
+		}
+
+		//Reading CharRockNum
+		if (p_evt_rw_auth_req->request.read.handle == p_pss->char_rock_num_handle.value_handle) {
+			charRockNumReadAuthReply(p_pss);
 		}
 	}
-
+	
+	if (p_evt_rw_auth_req->type == BLE_GATTS_AUTHORIZE_TYPE_WRITE) {
+		//Writing CharRockNum
+		if (p_evt_rw_auth_req->request.read.handle == p_pss->char_rock_num_handle.value_handle) {
+			charRockNumWriteAuthReply(p_pss, p_evt_rw_auth_req->request.write.data);
+		}
+	}
 
 	ble_gatts_evt_read_t * p_evt_read = &p_ble_evt->evt.gatts_evt.params.authorize_request.request.read;
 	if (p_pss->is_notification_supported) {
@@ -366,8 +426,8 @@ double pythagore3Fra(double a, double b, double c) {
 uint32_t sendDataPHYSENS(ble_pss_t* p_pss)
 {
     uint32_t err_code = NRF_SUCCESS;
-	uint16_t len = (SENSOR_ROW_SIZE);
-    uint8_t data[SENSOR_ROW_SIZE] = { 0 };
+	uint16_t len = (CHAR_SENSORS_DATA_VER_LEN);
+    uint8_t data[CHAR_SENSORS_DATA_VER_LEN] = { 0 };
 
 	if ((p_pss->conn_handle != BLE_CONN_HANDLE_INVALID) && p_pss->is_notification_supported) {
 		ble_gatts_hvx_params_t hvx_params;
@@ -447,15 +507,23 @@ uint32_t sendDiagInfo(ble_pss_t* p_pss)
 	return err_code;
 }
 
-uint32_t charDiagInfoRWAuthReply(ble_pss_t* p_pss) {
+uint32_t charDiagInfoReadAuthReply(ble_pss_t* p_pss) {
 	uint32_t err_code = NRF_SUCCESS;
 
 	uint32_t adcResult = 0;
+	uint32_t temp = 0;
+	uint8_t	tempData[2] = { 0 };
 
-	adcResult = GetAdcValue();
+	adcResult = GetAdcValue();		//Battery max level read 7.2V = 1.2 (referencec) * 3 (1/3 prescaling) * 2 (resistor divider)
 
-	//CharDiagInfoData[3] = ((adcResult & 0X00FF) * 0x64) / 0xFF;
-	//CharDiagInfoData[4] = adcResult & 0x00FF;
+	CharDiagInfoData[2] = ((adcResult & 0X00FF) * 0x64) / 0xFF;	//Battery Percentage Value
+	CharDiagInfoData[3] = adcResult & 0x00FF;					//Battery Actual Value
+
+	getTempData(tempData);
+
+	//0x00 = 25 deg C - 256bit/deg C
+	CharDiagInfoData[4] = tempData[1];	//tempData[1] = TEMP_H
+	CharDiagInfoData[5] = tempData[0];	//tempData[0] = TEMP_L
 
 	ble_gatts_rw_authorize_reply_params_t p_rw_authorize_reply_params;
 	p_rw_authorize_reply_params.type = BLE_GATTS_AUTHORIZE_TYPE_READ;
@@ -473,7 +541,7 @@ uint32_t charDiagInfoRWAuthReply(ble_pss_t* p_pss) {
 	}
 	return err_code;
 }
-uint32_t charFirmwVerRWAuthReply(ble_pss_t* p_pss) {
+uint32_t charFirmwVerReadAuthReply(ble_pss_t* p_pss) {
 	uint32_t err_code = NRF_SUCCESS;
 
 	ble_gatts_rw_authorize_reply_params_t p_rw_authorize_reply_params;
@@ -484,6 +552,58 @@ uint32_t charFirmwVerRWAuthReply(ble_pss_t* p_pss) {
 	p_rw_authorize_reply_params.params.read.p_data = CharFirmVerData;
 	p_rw_authorize_reply_params.params.read.offset = 0;
 	
+	if ((p_pss->conn_handle != BLE_CONN_HANDLE_INVALID)) {
+		err_code = sd_ble_gatts_rw_authorize_reply(p_pss->conn_handle, &p_rw_authorize_reply_params);
+	}
+	else {
+		err_code = NRF_ERROR_INVALID_STATE;
+	}
+	return err_code;
+}
+uint32_t charRockNumReadAuthReply(ble_pss_t* p_pss) {
+	uint32_t err_code = NRF_SUCCESS;
+
+	ble_gatts_rw_authorize_reply_params_t p_rw_authorize_reply_params;
+	p_rw_authorize_reply_params.type = BLE_GATTS_AUTHORIZE_TYPE_READ;
+	p_rw_authorize_reply_params.params.read.gatt_status = BLE_GATT_STATUS_SUCCESS;
+	p_rw_authorize_reply_params.params.read.update = 1;
+	p_rw_authorize_reply_params.params.read.len = CHAR_ROCK_NUM_LEN;
+	p_rw_authorize_reply_params.params.read.p_data = CharRockNumData;
+	p_rw_authorize_reply_params.params.read.offset = 0;
+
+	if ((p_pss->conn_handle != BLE_CONN_HANDLE_INVALID)) {
+		err_code = sd_ble_gatts_rw_authorize_reply(p_pss->conn_handle, &p_rw_authorize_reply_params);
+	}
+	else {
+		err_code = NRF_ERROR_INVALID_STATE;
+	}
+	return err_code;
+}
+uint32_t charRockNumWriteAuthReply(ble_pss_t* p_pss, uint8_t* p_data) {
+	uint32_t err_code = NRF_SUCCESS;
+
+	uint32_t temp;
+	temp = p_data[3];
+	printUSART0("RockNum[3]: [%h]\n", &temp);
+
+	if (p_data[3] == 0x99) {
+		temp = p_data[0];
+		printUSART0("RockNum[0]: [%h]\n", &temp);
+		temp = p_data[1];
+		printUSART0("RockNum[1]: [%h]\n", &temp);
+		temp = p_data[2];
+		printUSART0("RockNum[2]: [%h]\n", &temp);
+		
+		CharRockNumData[0] = p_data[0];
+		CharRockNumData[1] = p_data[1];
+		CharRockNumData[2] = p_data[2];
+		CharRockNumData[3] = p_data[3];
+	}
+
+	ble_gatts_rw_authorize_reply_params_t p_rw_authorize_reply_params;
+	p_rw_authorize_reply_params.type = BLE_GATTS_AUTHORIZE_TYPE_WRITE;
+	p_rw_authorize_reply_params.params.write.gatt_status = BLE_GATT_STATUS_SUCCESS;
+
 	if ((p_pss->conn_handle != BLE_CONN_HANDLE_INVALID)) {
 		err_code = sd_ble_gatts_rw_authorize_reply(p_pss->conn_handle, &p_rw_authorize_reply_params);
 	}

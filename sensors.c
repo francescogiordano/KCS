@@ -166,10 +166,10 @@ void getDataSENSOR(uint8_t* sensorData) {
 		sensorData[12] = tempData[3];		//Y_L
 		sensorData[13] = tempData[4];		//Z_H
 		sensorData[14] = tempData[5];		//Z_L
-		
-		uint32_t temp;
 
 		/*
+		uint32_t temp;
+
 		temp = tempData[0];
 		printUSART0("XH: [%h]\n", &temp);
 		temp = tempData[1];
