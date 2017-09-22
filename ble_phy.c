@@ -586,7 +586,8 @@ uint32_t charRockNumWriteAuthReply(ble_pss_t* p_pss, uint8_t* p_data) {
 	temp = p_data[3];
 	printUSART0("RockNum[3]: [%h]\n", &temp);
 
-	if (p_data[3] == 0x99) {
+	if (p_data[3] == CHAR_ROCK_NUM_WRITE_BYTE) {
+		
 		temp = p_data[0];
 		printUSART0("RockNum[0]: [%h]\n", &temp);
 		temp = p_data[1];

@@ -98,11 +98,11 @@
 //#include "ble_bondmngr.h"
 #include "ble_debug_assert_handler.h"
 #include "pstorage.h"
-
-
 #include "usart.h"
 #include "sensors.h"
 #include "delay.h"
+#include "flashmemory.h"
+
 // DFU BLE service support
 #include "ble_dfu.h"
 #include "dfu_app_handler.h"
@@ -119,39 +119,39 @@
 #define NRF51822_TX_POWER_LEVEL_0dBm		(0)											// accepted values are -40, -30, -20, -16, -12, -8, -4, 0, and 4 dBm).
 #define NRF51822_TX_POWER_LEVEL_4dBm		(4)
 
-#define DEVICE_NAME                          "Francesco"
-//#define DEVICE_NAME                          "Klutch Curling Sensor"					/**< Name of device. Will be included in the advertising data. */
+#define DEVICE_NAME                         "Francesco"
+//#define DEVICE_NAME                       "Klutch Curling Sensor"					/**< Name of device. Will be included in the advertising data. */
 #define DEVICE_FIRMWARE_VERSION_MAJOR		0x01
-#define DEVICE_FIRMWARE_VERSION_MINOR		0x00
+#define DEVICE_FIRMWARE_VERSION_MINOR		0x01
 #define DEVICE_FIRMWARE_VERSION_REVISION	0x00
-#define MANUFACTURER_NAME                    "nRF51822"                     			/**< Manufacturer. Will be passed to Device Information Service. */
-#define APP_ADV_INTERVAL                     64                                         /**< The advertising interval (in units of 0.625 ms. This value corresponds to 25 ms). */
-#define APP_ADV_TIMEOUT_180_SECONDS          180                                        /**< The advertising timeout in units of seconds. */
-#define APP_ADV_TIMEOUT_10_SECONDS	         10                                        /**< The advertising timeout in units of seconds. */
+#define MANUFACTURER_NAME                   "nRF51822"                     			/**< Manufacturer. Will be passed to Device Information Service. */
+#define APP_ADV_INTERVAL                    64                                         /**< The advertising interval (in units of 0.625 ms. This value corresponds to 25 ms). */
+#define APP_ADV_TIMEOUT_180_SECONDS         180                                        /**< The advertising timeout in units of seconds. */
+#define APP_ADV_TIMEOUT_10_SECONDS	        10                                        /**< The advertising timeout in units of seconds. */
 
-#define APP_TIMER_PRESCALER                  0                                          /**< Value of the RTC1 PRESCALER register. */
-#define APP_TIMER_MAX_TIMERS                 1                                          /**< Maximum number of simultaneously created timers. */
-#define APP_TIMER_OP_QUEUE_SIZE              1                                          /**< Size of timer operation queues. */
+#define APP_TIMER_PRESCALER                 0                                          /**< Value of the RTC1 PRESCALER register. */
+#define APP_TIMER_MAX_TIMERS                1                                          /**< Maximum number of simultaneously created timers. */
+#define APP_TIMER_OP_QUEUE_SIZE             1                                          /**< Size of timer operation queues. */
 
-#define MIN_CONN_INTERVAL                    MSEC_TO_UNITS(7.5, UNIT_1_25_MS)           /**< Minimum acceptable connection interval (0.5 seconds). */
-#define MAX_CONN_INTERVAL                    MSEC_TO_UNITS(10, UNIT_1_25_MS)            /**< Maximum acceptable connection interval (1 second). */
+#define MIN_CONN_INTERVAL                   MSEC_TO_UNITS(7.5, UNIT_1_25_MS)           /**< Minimum acceptable connection interval (0.5 seconds). */
+#define MAX_CONN_INTERVAL                   MSEC_TO_UNITS(10, UNIT_1_25_MS)            /**< Maximum acceptable connection interval (1 second). */
 
-#define SLAVE_LATENCY                        0                                          /**< Slave latency. */
-#define CONN_SUP_TIMEOUT                     MSEC_TO_UNITS(300, UNIT_10_MS)				/**< Connection supervisory timeout (4 seconds). */
+#define SLAVE_LATENCY                       0                                          /**< Slave latency. */
+#define CONN_SUP_TIMEOUT                    MSEC_TO_UNITS(300, UNIT_10_MS)				/**< Connection supervisory timeout (4 seconds). */
 
-#define FIRST_CONN_PARAMS_UPDATE_DELAY       APP_TIMER_TICKS(500, APP_TIMER_PRESCALER)	/**< Time from initiating event (connect or start of notification) to first time sd_ble_gap_conn_param_update is called (5 seconds). */
-#define NEXT_CONN_PARAMS_UPDATE_DELAY        APP_TIMER_TICKS(500, APP_TIMER_PRESCALER)	/**< Time between each call to sd_ble_gap_conn_param_update after the first call (30 seconds). */
-#define MAX_CONN_PARAMS_UPDATE_COUNT         3                                          /**< Number of attempts before giving up the connection parameter negotiation. */
+#define FIRST_CONN_PARAMS_UPDATE_DELAY      APP_TIMER_TICKS(500, APP_TIMER_PRESCALER)	/**< Time from initiating event (connect or start of notification) to first time sd_ble_gap_conn_param_update is called (5 seconds). */
+#define NEXT_CONN_PARAMS_UPDATE_DELAY       APP_TIMER_TICKS(500, APP_TIMER_PRESCALER)	/**< Time between each call to sd_ble_gap_conn_param_update after the first call (30 seconds). */
+#define MAX_CONN_PARAMS_UPDATE_COUNT        3                                          /**< Number of attempts before giving up the connection parameter negotiation. */
 
-#define SEC_PARAM_TIMEOUT                    30                                         /**< Timeout for Pairing Request or Security Request (in seconds). */
-#define SEC_PARAM_BOND                       1                                          /**< Perform bonding. */
-#define SEC_PARAM_MITM                       0                                          /**< Man In The Middle protection not required. */
-#define SEC_PARAM_IO_CAPABILITIES            BLE_GAP_IO_CAPS_NONE                       /**< No I/O capabilities. */
-#define SEC_PARAM_OOB                        0                                          /**< Out Of Band data not available. */
-#define SEC_PARAM_MIN_KEY_SIZE               7                                          /**< Minimum encryption key size. */
-#define SEC_PARAM_MAX_KEY_SIZE               16                                         /**< Maximum encryption key size. */
+#define SEC_PARAM_TIMEOUT                   30                                         /**< Timeout for Pairing Request or Security Request (in seconds). */
+#define SEC_PARAM_BOND                      1                                          /**< Perform bonding. */
+#define SEC_PARAM_MITM                      0                                          /**< Man In The Middle protection not required. */
+#define SEC_PARAM_IO_CAPABILITIES           BLE_GAP_IO_CAPS_NONE                       /**< No I/O capabilities. */
+#define SEC_PARAM_OOB                       0                                          /**< Out Of Band data not available. */
+#define SEC_PARAM_MIN_KEY_SIZE              7                                          /**< Minimum encryption key size. */
+#define SEC_PARAM_MAX_KEY_SIZE              16                                         /**< Maximum encryption key size. */
 
-#define DEAD_BEEF                            0xDEADBEEF                                 /**< Value used as error code on stack dump, can be used to identify stack location on stack unwind. */
+#define DEAD_BEEF                           0xDEADBEEF                                 /**< Value used as error code on stack dump, can be used to identify stack location on stack unwind. */
 
 #define DFU_REV_MAJOR						0x00                                       /** DFU Major revision number to be exposed. */
 #define DFU_REV_MINOR						0x01                                       /** DFU Minor revision number to be exposed. */
@@ -178,7 +178,7 @@ volatile uint8_t g_power_down = 0;	// 1 = Sleep after max_counter, 0 = Sleep aft
 
 volatile uint8_t CharDiagInfoData[6];
 volatile uint8_t CharFirmVerData[3] = { DEVICE_FIRMWARE_VERSION_MAJOR, DEVICE_FIRMWARE_VERSION_MINOR, DEVICE_FIRMWARE_VERSION_REVISION };
-volatile uint8_t CharRockNumData[3] = { 0x22,0x11,0x22 };
+volatile uint8_t CharRockNumData[4];
 
 //Function Prototypes
 void mcuSystemOff(void);
@@ -188,20 +188,47 @@ static void advertising_init(void) {	// init advertising data with type of servi
 	ble_advdata_t advdata;
 	ble_advdata_t scanrsp;
 
-	ble_advdata_manuf_data_t manuf_data; // Variable to hold manufacturer specific data
-	ble_advdata_service_data_t service_data;
 	ble_uuid_t adv_uuids[] = { { BLE_UUID_SERVICE_SENSORS, BLE_UUID_TYPE_BLE },{ BLE_UUID_SERVICE_DIAG, BLE_UUID_TYPE_BLE } };
 	
-	
+	/*
+	ble_advdata_manuf_data_t manuf_data; // Variable to hold manufacturer specific data
 	uint8_t data[] = "SomeData!"; // Our data to adverise
 	manuf_data.company_identifier = 0x0059; // Nordics company ID
 	manuf_data.data.p_data = data;
 	manuf_data.data.size = sizeof(data);
+	*/
 
-	uint8_t data2[] = "Sata"; // Our data to adverise
-	service_data.service_uuid = 0x2F99;
-	service_data.data.p_data = data2;
-	service_data.data.size = sizeof(data2);
+	uint32_t* flashMemory;
+	flashMemory = GetFlashMemoryStartAddress();
+
+	CharRockNumData[0] = flashMemory[0] >> 24;
+	CharRockNumData[1] = flashMemory[0] >> 16;
+	CharRockNumData[2] = flashMemory[0] >> 8;
+	CharRockNumData[3] = 0x00;
+
+	/**/
+	uint32_t temp;
+	temp = CharRockNumData[0];
+	printUSART0("AdRockNum[0]: [%h]\n", &temp);
+	temp = CharRockNumData[1];
+	printUSART0("AdRockNum[1]: [%h]\n", &temp);
+	temp = CharRockNumData[2];
+	printUSART0("AdRockNum[2]: [%h]\n", &temp);
+	temp = CharRockNumData[3];
+	printUSART0("AdRockNum[3]: [%h]\n", &temp);
+	/**/
+
+	uint8_t data[4];
+	
+	data[0] = CharRockNumData[0];
+	data[1] = CharRockNumData[1];
+	data[2] = CharRockNumData[2];
+	data[3] = CharRockNumData[3];
+
+	ble_advdata_service_data_t service_data;
+	service_data.service_uuid = BLE_UUID_CHAR_ROCK_NUMBER;
+	service_data.data.p_data = data;
+	service_data.data.size = sizeof(data);
 
 	// Build and set advertising data
 	memset(&advdata, 0, sizeof(advdata));
@@ -214,7 +241,6 @@ static void advertising_init(void) {	// init advertising data with type of servi
 	advdata.service_data_count = 1;
 	//advdata.p_manuf_specific_data = &manuf_data;
 	
-
 	memset(&scanrsp, 0, sizeof(scanrsp));
 	scanrsp.uuids_complete.uuid_cnt = sizeof(adv_uuids) / sizeof(adv_uuids[0]);
 	scanrsp.uuids_complete.p_uuids = adv_uuids;
@@ -369,6 +395,11 @@ static void ble_evt_dispatch(ble_evt_t * p_ble_evt) {	// dispatch BLE stack even
 }
 static void sys_evt_dispatch(uint32_t sys_evt) {	// dispatch system event to designated module (called from System event interrupt handler)
 	pstorage_sys_event_handler(sys_evt);
+
+	if (sys_evt == NRF_EVT_FLASH_OPERATION_SUCCESS || sys_evt == NRF_EVT_FLASH_OPERATION_ERROR) {
+		SetFlashMemoryOpDoneFlag(1);
+		printUSART0("NRF_EVT_FLASH Called\n", 0);
+	}
 }
 
 static void on_conn_params_evt(ble_conn_params_evt_t * p_evt)
@@ -658,6 +689,21 @@ int main(void){
 
 		if (g_ble_conn) {
 			sleep_counter = 0;
+			if (CharRockNumData[3] == CHAR_ROCK_NUM_WRITE_BYTE) {
+				uint32_t err_code;
+				uint32_t data[1];
+
+				data[0] = 0x00;
+				data[0] += ((uint32_t)CharRockNumData[0]) << 24;
+				data[0] += ((uint32_t)CharRockNumData[1]) << 16;
+				data[0] += ((uint32_t)CharRockNumData[2]) << 8;
+				CharRockNumData[3] = 0x00;
+
+				APP_ERROR_CHECK(FlashMemoryPageErase(0, 1));
+				APP_ERROR_CHECK(FlashMemoryPageWrite(0, data, 1));		
+
+				mcuSystemOff();
+			}
 		}
 		else if ((sleep_counter >= max_counter && g_power_down == 1) || (sleep_counter >= search_counter && g_power_down == 0)) {
 			sleep_counter = 0;

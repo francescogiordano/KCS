@@ -92,6 +92,7 @@ typedef enum
 #define BLE_UUID_SERVICE_ROCK_NUMBER		0x3100
 #define BLE_UUID_CHAR_ROCK_NUMBER			0x3101
 #define CHAR_ROCK_NUM_LEN					4
+#define CHAR_ROCK_NUM_WRITE_BYTE			0x99
 
 
 #define SETTINGS_MODE                   0x01
@@ -149,7 +150,7 @@ uint32_t charRockNumWriteAuthReply(ble_pss_t* , uint8_t* );
 
 extern volatile uint8_t CharDiagInfoData[6];
 extern volatile uint8_t CharFirmVerData[3];
-extern volatile uint8_t CharRockNumData[3];
+extern volatile uint8_t CharRockNumData[4];
 
 extern volatile uint8_t g_ble_conn;
 extern volatile ble_mode_t ble_mode;

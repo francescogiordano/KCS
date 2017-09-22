@@ -1,8 +1,8 @@
 #include "sensors.h"
 #include "ble_phy.h"
+#include "usart.h"
 
-
-static uint8_t sleepSensorErrorFlag = 0;
+static volatile uint8_t sleepSensorErrorFlag = 0;
 
 uint8_t initSensors(void) {
 	uint8_t errorFlag = 0;

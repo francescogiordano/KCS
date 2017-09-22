@@ -26,6 +26,7 @@ C_SOURCE_FILES += gpio.c
 C_SOURCE_FILES += adc.c
 C_SOURCE_FILES += spi.c
 C_SOURCE_FILES += delay.c
+C_SOURCE_FILES += flashmemory.c
 C_SOURCE_FILES += dfu_app_handler.c
 
 
