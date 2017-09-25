@@ -32,6 +32,7 @@ uint32_t initServiceSensors(ble_pss_t * p_pss, const ble_pss_init_t * p_pss_init
 	}
 
 	//Add Service UUID
+
 	//ble_uuid.type = p_pss->uuid_type;
 	ble_uuid.uuid = BLE_UUID_SERVICE_SENSORS;
 	ble_uuid.type = BLE_UUID_TYPE_BLE;
@@ -43,10 +44,11 @@ uint32_t initServiceSensors(ble_pss_t * p_pss, const ble_pss_init_t * p_pss_init
 
     // Add  Service Sensors Characteristics
 	err_code = addCharSensorsData(p_pss, p_pss_init);
-	err_code = addCharSensorsWrite(p_pss, p_pss_init);
+	err_code = addCharSensorsDataNotify(p_pss, p_pss_init);
 	err_code = addCharDiagInfo(p_pss, p_pss_init);
 	err_code = addCharFirmVer(p_pss, p_pss_init);
 	err_code = addCharRockNum(p_pss, p_pss_init);
+	err_code = addCharTxPowerLevel(p_pss, p_pss_init);
 
 	return err_code;
 }
@@ -55,7 +57,7 @@ static uint32_t addCharSensorsData(ble_pss_t * p_pss, const ble_pss_init_t * p_p
 	ble_uuid_t          ble_uuid;
 	ble_gatts_char_md_t char_md;
 	ble_gatts_attr_md_t attr_md;
-	ble_gatts_attr_md_t p_user_desc_md;
+	//ble_gatts_attr_md_t p_user_desc_md;
     ble_gatts_attr_md_t cccd_md;
     ble_gatts_attr_t    attr_char_value;
 
@@ -91,26 +93,27 @@ static uint32_t addCharSensorsData(ble_pss_t * p_pss, const ble_pss_init_t * p_p
     attr_md.wr_auth    = 0;
     attr_md.vlen       = 0;
 
+	uint8_t value[CHAR_SENSORS_DATA_VER_LEN];
     memset(&attr_char_value, 0, sizeof(attr_char_value));
     attr_char_value.p_uuid       = &ble_uuid;
     attr_char_value.p_attr_md    = &attr_md;
     attr_char_value.init_len     = (CHAR_SENSORS_DATA_VER_LEN);
     attr_char_value.init_offs    = 0;
     attr_char_value.max_len      = (CHAR_SENSORS_DATA_VER_LEN);
-    attr_char_value.p_value      = NULL;
+    attr_char_value.p_value      = value;
 
     return sd_ble_gatts_characteristic_add(p_pss->service_handle, &char_md, &attr_char_value, &p_pss->char_sensor_data_handle);
 }
-static uint32_t addCharSensorsWrite(ble_pss_t * p_pss, const ble_pss_init_t * p_pss_init) {	// add Sensors Write characteristics
+static uint32_t addCharSensorsDataNotify(ble_pss_t * p_pss, const ble_pss_init_t * p_pss_init) {	// add Sensors Write characteristics
 
 	ble_uuid_t          ble_uuid;
 	ble_gatts_char_md_t char_md;
 	ble_gatts_attr_md_t attr_md;
-	ble_gatts_attr_md_t p_user_desc_md;
+	//ble_gatts_attr_md_t p_user_desc_md;
 	ble_gatts_attr_md_t cccd_md;
 	ble_gatts_attr_t    attr_char_value;
 
-	char user_desc[] = "Sensor Write";
+	char user_desc[] = "Sensor Data Notify";
 
 	memset(&cccd_md, 0, sizeof(cccd_md));
 	BLE_GAP_CONN_SEC_MODE_SET_OPEN(&cccd_md.read_perm);
@@ -131,7 +134,7 @@ static uint32_t addCharSensorsWrite(ble_pss_t * p_pss, const ble_pss_init_t * p_
 
 
 	ble_uuid.type = p_pss->uuid_type;
-	ble_uuid.uuid = BLE_UUID_CHAR_SENSORS_DATA_WRITE;
+	ble_uuid.uuid = BLE_UUID_CHAR_SENSORS_DATA_NOTIFY;
 
 	memset(&attr_md, 0, sizeof(attr_md));
 	BLE_GAP_CONN_SEC_MODE_SET_NO_ACCESS(&attr_md.read_perm);
@@ -157,7 +160,7 @@ static uint32_t addCharDiagInfo(ble_pss_t * p_pss, const ble_pss_init_t * p_pss_
 	ble_uuid_t          ble_uuid;
 	ble_gatts_char_md_t char_md;
 	ble_gatts_attr_md_t attr_md;
-	ble_gatts_attr_md_t p_user_desc_md;
+	//ble_gatts_attr_md_t p_user_desc_md;
 	ble_gatts_attr_md_t cccd_md;
 	ble_gatts_attr_t    attr_char_value;
 
@@ -205,7 +208,7 @@ static uint32_t addCharFirmVer(ble_pss_t * p_pss, const ble_pss_init_t * p_pss_i
 	ble_uuid_t          ble_uuid;
 	ble_gatts_char_md_t char_md;
 	ble_gatts_attr_md_t attr_md;
-	ble_gatts_attr_md_t p_user_desc_md;
+	//ble_gatts_attr_md_t p_user_desc_md;
 	ble_gatts_attr_md_t cccd_md;
 	ble_gatts_attr_t    attr_char_value;
 
@@ -254,7 +257,7 @@ static uint32_t addCharRockNum(ble_pss_t * p_pss, const ble_pss_init_t * p_pss_i
 	ble_uuid_t          ble_uuid;
 	ble_gatts_char_md_t char_md;
 	ble_gatts_attr_md_t attr_md;
-	ble_gatts_attr_md_t p_user_desc_md;
+	//ble_gatts_attr_md_t p_user_desc_md;
 	ble_gatts_attr_md_t cccd_md;
 	ble_gatts_attr_t    attr_char_value;
 
@@ -298,9 +301,58 @@ static uint32_t addCharRockNum(ble_pss_t * p_pss, const ble_pss_init_t * p_pss_i
 
 	return sd_ble_gatts_characteristic_add(p_pss->service_handle, &char_md, &attr_char_value, &p_pss->char_rock_num_handle);
 }
+static uint32_t addCharTxPowerLevel(ble_pss_t * p_pss, const ble_pss_init_t * p_pss_init) {
+
+	ble_uuid_t          ble_uuid;
+	ble_gatts_char_md_t char_md;
+	ble_gatts_attr_md_t attr_md;
+	//ble_gatts_attr_md_t p_user_desc_md;
+	ble_gatts_attr_md_t cccd_md;
+	ble_gatts_attr_t    attr_char_value;
+
+	char user_desc[] = "Tx Power Level";
+
+	memset(&cccd_md, 0, sizeof(cccd_md));
+	BLE_GAP_CONN_SEC_MODE_SET_OPEN(&cccd_md.read_perm);
+	BLE_GAP_CONN_SEC_MODE_SET_OPEN(&cccd_md.write_perm);
+	cccd_md.vloc = BLE_GATTS_VLOC_STACK;
+
+	memset(&char_md, 0, sizeof(char_md));
+	char_md.char_props.read = 1;
+	char_md.char_props.write = 1;
+	char_md.p_char_user_desc = (uint8_t *)user_desc;
+	char_md.char_user_desc_size = strlen(user_desc);
+	char_md.char_user_desc_max_size = strlen(user_desc);
+	char_md.p_char_pf = NULL;
+	char_md.p_user_desc_md = NULL;
+	char_md.p_cccd_md = &cccd_md;
+	char_md.p_sccd_md = NULL;
+
+	ble_uuid.type = p_pss->uuid_type;
+	ble_uuid.uuid = BLE_UUID_CHAR_TX_POWER_LEVEL;
+
+	memset(&attr_md, 0, sizeof(attr_md));
+	BLE_GAP_CONN_SEC_MODE_SET_OPEN(&attr_md.read_perm);
+	BLE_GAP_CONN_SEC_MODE_SET_OPEN(&attr_md.write_perm);
+	attr_md.vloc = BLE_GATTS_VLOC_STACK;
+	attr_md.rd_auth = 1;
+	attr_md.wr_auth = 1;
+	attr_md.vlen = 0;
+
+	uint8_t value[CHAR_TX_POWER_LEVEL_LEN];
+	memset(&attr_char_value, 0, sizeof(attr_char_value));
+	attr_char_value.p_uuid = &ble_uuid;
+	attr_char_value.p_attr_md = &attr_md;
+	attr_char_value.init_len = (CHAR_TX_POWER_LEVEL_LEN);
+	attr_char_value.init_offs = 0;
+	attr_char_value.max_len = (CHAR_TX_POWER_LEVEL_LEN);
+	attr_char_value.p_value = value;
+
+	return sd_ble_gatts_characteristic_add(p_pss->service_handle, &char_md, &attr_char_value, &p_pss->char_tx_power_level_handle);
+}
 
 
-void onBleEvenPHYSEN(ble_pss_t* p_pss, ble_evt_t* p_ble_evt) {	// call functions for appropriate ble events
+void onBleEvtKCS(ble_pss_t* p_pss, ble_evt_t* p_ble_evt) {	// call functions for appropriate ble events
     switch (p_ble_evt->header.evt_id) {
         case BLE_GAP_EVT_CONNECTED:
 			onEvtConn(p_pss, p_ble_evt);
@@ -321,7 +373,7 @@ void onBleEvenPHYSEN(ble_pss_t* p_pss, ble_evt_t* p_ble_evt) {	// call functions
         default:
             break;
     }
-	sendDataPHYSENS(p_pss);
+	updateCharSensorsData(p_pss);
 }
 
 static void onEvtConn(ble_pss_t* p_pss, ble_evt_t* p_ble_evt) {	// handle connect event
@@ -335,25 +387,15 @@ static void onEvtWrite(ble_pss_t* p_pss, ble_evt_t* p_ble_evt) {		// handle writ
     ble_gatts_evt_write_t * p_evt_write = &p_ble_evt->evt.gatts_evt.params.write;
 
     if (p_evt_write->handle == p_pss->char_sensor_write_handle.value_handle) {
-        switch(p_evt_write->data[0]) {
-            case SETTINGS_NEW:
-            case LAUNCH_MODE:
-                ble_mode = BLE_LAUNCH_MODE;
-                initTIMER2();
-                break;
+        /*
+		switch(p_evt_write->data[0]) {
 
             case FREE_MODE:
                 ble_mode = BLE_FREE_MODE;
                 initTIMER2();
                 break;
-
-            case SETTINGS_MODE:
-            case CALIB_AXIS:
-
-            case POWER_DOWN_CORRECT:
-                g_power_down = 1;
-                break;
         }
+		*/
     }
 
     if (p_pss->is_notification_supported) {
@@ -374,18 +416,19 @@ static void onEvtRW(ble_pss_t* p_pss, ble_evt_t* p_ble_evt) {		// handle write e
 
 		//Reading CharDiagInfo
 		if (p_evt_rw_auth_req->request.read.handle == p_pss->char_diag_info_handle.value_handle) {
-			//sendDiagInfo(p_pss);
 			charDiagInfoReadAuthReply(p_pss);
-		}
-		
+		}		
 		//Reading CharFirmVer
-		if (p_evt_rw_auth_req->request.read.handle == p_pss->char_firm_ver_handle.value_handle) {
+		else if (p_evt_rw_auth_req->request.read.handle == p_pss->char_firm_ver_handle.value_handle) {
 			charFirmwVerReadAuthReply(p_pss);
 		}
-
 		//Reading CharRockNum
-		if (p_evt_rw_auth_req->request.read.handle == p_pss->char_rock_num_handle.value_handle) {
+		else if (p_evt_rw_auth_req->request.read.handle == p_pss->char_rock_num_handle.value_handle) {
 			charRockNumReadAuthReply(p_pss);
+		}
+		//Reading CharTxPowerLevel
+		else if (p_evt_rw_auth_req->request.read.handle == p_pss->char_tx_power_level_handle.value_handle) {
+			charTxPowerLevelReadAuthReply(p_pss);
 		}
 	}
 	
@@ -393,6 +436,10 @@ static void onEvtRW(ble_pss_t* p_pss, ble_evt_t* p_ble_evt) {		// handle write e
 		//Writing CharRockNum
 		if (p_evt_rw_auth_req->request.read.handle == p_pss->char_rock_num_handle.value_handle) {
 			charRockNumWriteAuthReply(p_pss, p_evt_rw_auth_req->request.write.data);
+		}
+		//Writing CharTxPowerLevel
+		else if (p_evt_rw_auth_req->request.read.handle == p_pss->char_tx_power_level_handle.value_handle) {
+			charTxPowerLevelWriteAuthReply(p_pss, p_evt_rw_auth_req->request.write.data);
 		}
 	}
 
@@ -409,6 +456,7 @@ static void onEvtRW(ble_pss_t* p_pss, ble_evt_t* p_ble_evt) {		// handle write e
 	}
 }
 
+/*
 double toDoubleFra(uint8_t high, uint8_t low) {
 	uint16_t conversion_form;
 
@@ -422,8 +470,9 @@ double toDoubleFra(uint8_t high, uint8_t low) {
 double pythagore3Fra(double a, double b, double c) {
 	return sqrt((a*a) + (b*b) + (c*c));
 }
+*/
 
-uint32_t sendDataPHYSENS(ble_pss_t* p_pss)
+uint32_t updateCharSensorsData(ble_pss_t* p_pss)
 {
     uint32_t err_code = NRF_SUCCESS;
 	uint16_t len = (CHAR_SENSORS_DATA_VER_LEN);
@@ -438,20 +487,8 @@ uint32_t sendDataPHYSENS(ble_pss_t* p_pss)
 		hvx_params.type     = BLE_GATT_HVX_NOTIFICATION;
 		hvx_params.p_len    = &len;
 
-        switch (ble_mode) {
-			case BLE_SETTINGS_MODE:
-			case BLE_CALIB_AXIS_MODE:
-			case BLE_LAUNCH_MODE:
-			case BLE_FREE_MODE:
-			case BLE_OTHER_MODE:
+		getDataSENSOR(data);
 
-				getDataSENSOR(data);
-
-				break;
-
-			default:
-				break;
-        }
 		hvx_params.p_data = data;
 
 		err_code = sd_ble_gatts_hvx(p_pss->conn_handle, &hvx_params);
@@ -461,13 +498,12 @@ uint32_t sendDataPHYSENS(ble_pss_t* p_pss)
 	}
     return err_code;
 }
-uint32_t sendDiagInfo(ble_pss_t* p_pss)
+uint32_t updateCharDiagInfo(ble_pss_t* p_pss)
 {
 	uint32_t err_code = NRF_SUCCESS;
 	uint16_t len = (CHAR_DIAG_INFO_LEN);
 
 	uint32_t adcResult = 0;
-	uint32_t temp = 0;
 	uint8_t	tempData[2] = { 0 };
 
 	adcResult = GetAdcValue();		//Battery max level read 7.2V = 1.2 (referencec) * 3 (1/3 prescaling) * 2 (resistor divider)
@@ -475,10 +511,13 @@ uint32_t sendDiagInfo(ble_pss_t* p_pss)
 	CharDiagInfoData[2] = ((adcResult & 0X00FF) * 0x64) / 0xFF;	//Battery Percentage Value
 	CharDiagInfoData[3] = adcResult & 0x00FF;					//Battery Actual Value
 
-	//temp = CharDiagInfoData[2];
-	//printUSART0("-> Battery Level Percent: [%h]\n", &temp);
-	//temp = CharDiagInfoData[3];
-	//printUSART0("-> ADC Value - Max 0xFF: [%h]\n", &temp);
+	/*
+	uint32_t text = 0;
+	text = CharDiagInfoData[2];
+	printUSART0("-> Battery Level Percent: [%h]\n", &text);
+	text = CharDiagInfoData[3];
+	printUSART0("-> ADC Value - Max 0xFF: [%h]\n", &text);
+	*/
 
 	getTempData(tempData);
 
@@ -511,8 +550,7 @@ uint32_t charDiagInfoReadAuthReply(ble_pss_t* p_pss) {
 	uint32_t err_code = NRF_SUCCESS;
 
 	uint32_t adcResult = 0;
-	uint32_t temp = 0;
-	uint8_t	tempData[2] = { 0 };
+	uint8_t	tempData[2] = {0, 0};
 
 	adcResult = GetAdcValue();		//Battery max level read 7.2V = 1.2 (referencec) * 3 (1/3 prescaling) * 2 (resistor divider)
 
@@ -582,19 +620,19 @@ uint32_t charRockNumReadAuthReply(ble_pss_t* p_pss) {
 uint32_t charRockNumWriteAuthReply(ble_pss_t* p_pss, uint8_t* p_data) {
 	uint32_t err_code = NRF_SUCCESS;
 
-	uint32_t temp;
-	temp = p_data[3];
-	printUSART0("RockNum[3]: [%h]\n", &temp);
+	uint32_t text;
+	text = p_data[3];
+	printUSART0("RockNum[3]: [%h]\n", &text);
 
-	if (p_data[3] == CHAR_ROCK_NUM_WRITE_BYTE) {
-		
+	if (p_data[3] == CHAR_ROCK_NUM_WRITE_BYTE) {		
+		/*
 		temp = p_data[0];
-		printUSART0("RockNum[0]: [%h]\n", &temp);
+		printUSART0("RockNum[0]: [%h]\n", &text);
 		temp = p_data[1];
-		printUSART0("RockNum[1]: [%h]\n", &temp);
+		printUSART0("RockNum[1]: [%h]\n", &text);
 		temp = p_data[2];
-		printUSART0("RockNum[2]: [%h]\n", &temp);
-		
+		printUSART0("RockNum[2]: [%h]\n", &text);
+		*/
 		CharRockNumData[0] = p_data[0];
 		CharRockNumData[1] = p_data[1];
 		CharRockNumData[2] = p_data[2];
@@ -614,3 +652,73 @@ uint32_t charRockNumWriteAuthReply(ble_pss_t* p_pss, uint8_t* p_data) {
 	return err_code;
 }
 
+uint32_t charTxPowerLevelReadAuthReply(ble_pss_t* p_pss) {
+	uint32_t err_code = NRF_SUCCESS;
+
+	ble_gatts_rw_authorize_reply_params_t p_rw_authorize_reply_params;
+	p_rw_authorize_reply_params.type = BLE_GATTS_AUTHORIZE_TYPE_READ;
+	p_rw_authorize_reply_params.params.read.gatt_status = BLE_GATT_STATUS_SUCCESS;
+	p_rw_authorize_reply_params.params.read.update = 1;
+	p_rw_authorize_reply_params.params.read.len = CHAR_TX_POWER_LEVEL_LEN;
+	p_rw_authorize_reply_params.params.read.p_data = TxPowerLevelData;
+	p_rw_authorize_reply_params.params.read.offset = 0;
+
+	if ((p_pss->conn_handle != BLE_CONN_HANDLE_INVALID)) {
+		err_code = sd_ble_gatts_rw_authorize_reply(p_pss->conn_handle, &p_rw_authorize_reply_params);
+	}
+	else {
+		err_code = NRF_ERROR_INVALID_STATE;
+	}
+	return err_code;
+}
+uint32_t charTxPowerLevelWriteAuthReply(ble_pss_t* p_pss, uint8_t* p_data) {
+	uint32_t err_code = NRF_SUCCESS;
+	uint32_t text;
+
+	if (p_data[0] > 0 && p_data[0] <= 4) {
+		if (p_data[0] == 1) {
+			text = sd_ble_gap_tx_power_set(NRF51822_TX_POWER_LEVEL_4dBm);
+			if (text == (NRF_SUCCESS)) {
+				text = NRF51822_TX_POWER_LEVEL_4dBm;
+				printUSART0("Tx power changed to [%d]dBm\n", &text);
+				TxPowerLevelData[0] = 1;
+			}
+		}
+		else if (p_data[0] == 2) {
+			text = sd_ble_gap_tx_power_set(NRF51822_TX_POWER_LEVEL_0dBm);
+			if (text == (NRF_SUCCESS)) {
+				text = NRF51822_TX_POWER_LEVEL_0dBm;
+				printUSART0("Tx power changed to [%d]dBm\n", &text);
+				TxPowerLevelData[0] = 2;
+			}
+		}
+		else if (p_data[0] == 3) {
+			text = sd_ble_gap_tx_power_set(NRF51822_TX_POWER_LEVEL_NEG_4dBm);
+			if (text == (NRF_SUCCESS)) {
+				text = NRF51822_TX_POWER_LEVEL_NEG_4dBm;
+				printUSART0("Tx power changed to [%d]dBm\n", &text);
+				TxPowerLevelData[0] = 3;
+			}
+		}
+		else if (p_data[0] == 4) {
+			text = sd_ble_gap_tx_power_set(NRF51822_TX_POWER_LEVEL_NEG_8dBm);
+			if (text == (NRF_SUCCESS)) {
+				text = NRF51822_TX_POWER_LEVEL_NEG_8dBm;
+				printUSART0("Tx power changed to [%d]dBm\n", &text);
+				TxPowerLevelData[0] = 4;
+			}
+		}
+	}
+
+	ble_gatts_rw_authorize_reply_params_t p_rw_authorize_reply_params;
+	p_rw_authorize_reply_params.type = BLE_GATTS_AUTHORIZE_TYPE_WRITE;
+	p_rw_authorize_reply_params.params.write.gatt_status = BLE_GATT_STATUS_SUCCESS;
+
+	if ((p_pss->conn_handle != BLE_CONN_HANDLE_INVALID)) {
+		err_code = sd_ble_gatts_rw_authorize_reply(p_pss->conn_handle, &p_rw_authorize_reply_params);
+	}
+	else {
+		err_code = NRF_ERROR_INVALID_STATE;
+	}
+	return err_code;
+}

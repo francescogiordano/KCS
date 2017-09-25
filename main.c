@@ -112,17 +112,10 @@
 #define SCHED_MAX_EVENT_DATA_SIZE			sizeof(app_timer_event_t)                   /**< Maximum size of scheduler events. Note that scheduler BLE stack events do not contain any data, as the events are being pulled from the stack in the event handler. */
 #define SCHED_QUEUE_SIZE					20                                          /**< Maximum number of events in the scheduler queue. */
 
-#define NRF51822_TX_POWER_LEVEL_NEG_20dBm	(-20)
-#define NRF51822_TX_POWER_LEVEL_NEG_16dBm	(-16)
-#define NRF51822_TX_POWER_LEVEL_NEG_12dBm	(-12)
-#define NRF51822_TX_POWER_LEVEL_NEG_8dBm	(-8)
-#define NRF51822_TX_POWER_LEVEL_0dBm		(0)											// accepted values are -40, -30, -20, -16, -12, -8, -4, 0, and 4 dBm).
-#define NRF51822_TX_POWER_LEVEL_4dBm		(4)
-
 #define DEVICE_NAME                         "Francesco"
 //#define DEVICE_NAME                       "Klutch Curling Sensor"					/**< Name of device. Will be included in the advertising data. */
 #define DEVICE_FIRMWARE_VERSION_MAJOR		0x01
-#define DEVICE_FIRMWARE_VERSION_MINOR		0x01
+#define DEVICE_FIRMWARE_VERSION_MINOR		0x02
 #define DEVICE_FIRMWARE_VERSION_REVISION	0x00
 #define MANUFACTURER_NAME                   "nRF51822"                     			/**< Manufacturer. Will be passed to Device Information Service. */
 #define APP_ADV_INTERVAL                    64                                         /**< The advertising interval (in units of 0.625 ms. This value corresponds to 25 ms). */
@@ -171,14 +164,10 @@ static dm_application_instance_t			m_app_handle;                              /*
 // Mode management
 volatile ble_mode_t ble_mode = BLE_SETTINGS_MODE;
 
-uint16_t reconstruction;
-
-// PowerDown routine
-volatile uint8_t g_power_down = 0;	// 1 = Sleep after max_counter, 0 = Sleep after search_counter
-
 volatile uint8_t CharDiagInfoData[6];
 volatile uint8_t CharFirmVerData[3] = { DEVICE_FIRMWARE_VERSION_MAJOR, DEVICE_FIRMWARE_VERSION_MINOR, DEVICE_FIRMWARE_VERSION_REVISION };
 volatile uint8_t CharRockNumData[4];
+volatile uint8_t TxPowerLevelData[1] = { 0 };
 
 //Function Prototypes
 void mcuSystemOff(void);
@@ -206,7 +195,7 @@ static void advertising_init(void) {	// init advertising data with type of servi
 	CharRockNumData[2] = flashMemory[0] >> 8;
 	CharRockNumData[3] = 0x00;
 
-	/**/
+	/*
 	uint32_t temp;
 	temp = CharRockNumData[0];
 	printUSART0("AdRockNum[0]: [%h]\n", &temp);
@@ -216,7 +205,7 @@ static void advertising_init(void) {	// init advertising data with type of servi
 	printUSART0("AdRockNum[2]: [%h]\n", &temp);
 	temp = CharRockNumData[3];
 	printUSART0("AdRockNum[3]: [%h]\n", &temp);
-	/**/
+	*/
 
 	uint8_t data[4];
 	
@@ -348,10 +337,9 @@ static void on_ble_evt(ble_evt_t * p_ble_evt) {		// handle application's BLE sta
 
 		case BLE_GAP_EVT_CONNECTED:
 			printUSART0("-> BLE: New device connected [%d]\n", &utmp32);
-			//delay_ms(5);
 			g_ble_conn = 1;
 
-			// execute appropriate handle function for a given ble service!!!
+			//execute appropriate handle function for a given ble service!!!
 			m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
 			break;
 
@@ -391,7 +379,7 @@ static void ble_evt_dispatch(ble_evt_t * p_ble_evt) {	// dispatch BLE stack even
 	ble_advertising_on_ble_evt(p_ble_evt);
 
 	on_ble_evt(p_ble_evt);
-	onBleEvenPHYSEN(&m_pss, p_ble_evt);
+	onBleEvtKCS(&m_pss, p_ble_evt);
 }
 static void sys_evt_dispatch(uint32_t sys_evt) {	// dispatch system event to designated module (called from System event interrupt handler)
 	pstorage_sys_event_handler(sys_evt);
@@ -480,13 +468,9 @@ static void ble_stack_init(void)
 {/// init BLE stack (softdevice) & interrupts
 	uint32_t err_code;
 
-	//NRF_CLOCK->LFCLKSRC = (CLOCK_LFCLKSRC_SRC_RC << CLOCK_LFCLKSRC_SRC_Pos);
-	//NRF_CLOCK->EVENTS_LFCLKSTARTED = 0;
-	//NRF_CLOCK->TASKS_LFCLKSTART = 1;
-
 	// Initialize the SoftDevice handler module.
-	//SOFTDEVICE_HANDLER_INIT(NRF_CLOCK_LFCLKSRC_XTAL_20_PPM, false);
-
+	//SOFTDEVICE_HANDLER_INIT(NRF_CLOCK_LFCLKSRC_XTAL_500_PPM, false);
+	
 	SOFTDEVICE_HANDLER_INIT(NRF_CLOCK_LFCLKSRC_RC_250_PPM_250MS_CALIBRATION, false);
 
 	// Enable BLE stack
@@ -625,13 +609,13 @@ void mcuSystemOff() {
 
 int main(void){
 
+	//sd_power_dcdc_mode_set(NRF_POWER_DCDC_ENABLE);
+
 	uint32_t utmp32;
     uint32_t sleep_counter = 0;
-	uint32_t max_counter = 200;
-    uint32_t search_counter = max_counter;
-
+	uint32_t max_counter = 10;
+   
 	// Init system modules
-
 	initGPIO();
 
 	InitAdc(ADC_PIN);
@@ -662,10 +646,11 @@ int main(void){
     scheduler_init();
     gap_params_init();
 
-    utmp32 = sd_ble_gap_tx_power_set(NRF51822_TX_POWER_LEVEL_4dBm);
+    utmp32 = sd_ble_gap_tx_power_set(NRF51822_TX_POWER_LEVEL_NEG_8dBm);
     if(utmp32 == (NRF_SUCCESS)) {
-		utmp32 = NRF51822_TX_POWER_LEVEL_4dBm;
+		utmp32 = NRF51822_TX_POWER_LEVEL_NEG_8dBm;
 		printUSART0("Tx power changed to [%d]dBm\n",&utmp32);
+		TxPowerLevelData[0] = 4;
 	}
 	else {
 		printUSART0("Error setting Tx power\n",0);
@@ -705,7 +690,7 @@ int main(void){
 				mcuSystemOff();
 			}
 		}
-		else if ((sleep_counter >= max_counter && g_power_down == 1) || (sleep_counter >= search_counter && g_power_down == 0)) {
+		else if (sleep_counter >= max_counter) {
 			sleep_counter = 0;
 			mcuSystemOff();
 		}

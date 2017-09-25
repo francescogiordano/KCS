@@ -19,7 +19,6 @@
 
 extern volatile uint8_t CharDiagInfoData[6];
 extern volatile uint8_t CharFirmVerData[3];
-extern volatile uint8_t CharRockNumData[4];
 
 bool getAccelData(uint8_t* );
 bool getGyroData(uint8_t* );

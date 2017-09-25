@@ -152,24 +152,27 @@ void getDataSENSOR(uint8_t* sensorData) {
 	sensorData[8] = counter++;
 
 	sensorData[9] = 0;
+	
+	/*
 	sensorData[10] = 0;
 	sensorData[11] = 0;
 	sensorData[12] = 0;
 	sensorData[13] = 0;
 	sensorData[14] = 0;
-
+	*/
 	if (getMagData(tempData) == 0) {
 
+		/*
 		sensorData[9] = tempData[0];		//X_H
 		sensorData[10] = tempData[1];		//X_L
 		sensorData[11] = tempData[2];		//Y_H
 		sensorData[12] = tempData[3];		//Y_L
 		sensorData[13] = tempData[4];		//Z_H
 		sensorData[14] = tempData[5];		//Z_L
+		*/
 
 		/*
 		uint32_t temp;
-
 		temp = tempData[0];
 		printUSART0("XH: [%h]\n", &temp);
 		temp = tempData[1];
@@ -301,21 +304,20 @@ void initTIMER2(void) {
 	
 	NRF_TIMER2->MODE = TIMER_MODE_MODE_Timer;
 	NRF_TIMER2->BITMODE = TIMER_BITMODE_BITMODE_32Bit << TIMER_BITMODE_BITMODE_Pos;			// Set counter to 16 bit resolution
-	NRF_TIMER2->PRESCALER = 0x0004;		// 16MHz clock & 16 prescaler means 1MHz timer clock
+	//NRF_TIMER2->PRESCALER = 0x0004;		// 16MHz clock & 16 prescaler means 1MHz timer clock
+	NRF_TIMER2->PRESCALER = 0x0008;		// 16MHz clock & 256 prescaler means 62.5KHz timer clock
 
 	NRF_TIMER2->TASKS_CLEAR = 1;        // clear the task first to be usable for later
 
-	NRF_TIMER2->CC[0] = 5000;
+	NRF_TIMER2->CC[0] = 6250;			//16-bit timer 6250 = 100ms @ 62.5Khz clock
 	
 	NRF_TIMER2->INTENSET = (TIMER_INTENSET_COMPARE0_Enabled << TIMER_INTENSET_COMPARE0_Pos);
 	
 	NVIC_SetPriority(TIMER2_IRQn, 3);
 	NVIC_EnableIRQ(TIMER2_IRQn);
-		
-	//NRF_TIMER2->TASKS_START = 1;	// start TIMER2
 }
 void startTIMER2(void) {
-	NRF_TIMER2->TASKS_START = 1;		// stop TIMER2
+	NRF_TIMER2->TASKS_START = 1;	// start TIMER2
 }
 void stopTIMER2(void) {
 	NRF_TIMER2->TASKS_STOP = 1;		// stop TIMER2
