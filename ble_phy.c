@@ -44,7 +44,7 @@ uint32_t initServiceSensors(ble_pss_t * p_pss, const ble_pss_init_t * p_pss_init
 
     // Add  Service Sensors Characteristics
 	err_code = addCharSensorsData(p_pss, p_pss_init);
-	err_code = addCharSensorsDataNotify(p_pss, p_pss_init);
+	//err_code = addCharSensorsDataNotify(p_pss, p_pss_init);
 	err_code = addCharDiagInfo(p_pss, p_pss_init);
 	err_code = addCharFirmVer(p_pss, p_pss_init);
 	err_code = addCharRockNum(p_pss, p_pss_init);
@@ -376,10 +376,12 @@ void onBleEvtKCS(ble_pss_t* p_pss, ble_evt_t* p_ble_evt) {	// call functions for
 	updateCharSensorsData(p_pss);
 }
 
-static void onEvtConn(ble_pss_t* p_pss, ble_evt_t* p_ble_evt) {	// handle connect event
+static void onEvtConn(ble_pss_t* p_pss, ble_evt_t* p_ble_evt) {
+	// handle connect event
     p_pss->conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
 }
-static void onEvtDisc(ble_pss_t* p_pss, ble_evt_t* p_ble_evt) {	// handle disconnect event
+static void onEvtDisc(ble_pss_t* p_pss, ble_evt_t* p_ble_evt) {
+	// handle disconnect event
     UNUSED_PARAMETER(p_ble_evt);
     p_pss->conn_handle = BLE_CONN_HANDLE_INVALID;
 }
@@ -397,7 +399,7 @@ static void onEvtWrite(ble_pss_t* p_pss, ble_evt_t* p_ble_evt) {		// handle writ
         }
 		*/
     }
-
+	/*
     if (p_pss->is_notification_supported) {
         if ((p_evt_write->handle == p_pss->char_sensor_write_handle.cccd_handle)) {
             // CCCD written, call application event handler
@@ -408,6 +410,7 @@ static void onEvtWrite(ble_pss_t* p_pss, ble_evt_t* p_ble_evt) {		// handle writ
             }
         }
     }
+	*/
 }
 static void onEvtRW(ble_pss_t* p_pss, ble_evt_t* p_ble_evt) {		// handle write event
 
@@ -442,7 +445,7 @@ static void onEvtRW(ble_pss_t* p_pss, ble_evt_t* p_ble_evt) {		// handle write e
 			charTxPowerLevelWriteAuthReply(p_pss, p_evt_rw_auth_req->request.write.data);
 		}
 	}
-
+	/*
 	ble_gatts_evt_read_t * p_evt_read = &p_ble_evt->evt.gatts_evt.params.authorize_request.request.read;
 	if (p_pss->is_notification_supported) {
 		if ((p_evt_read->handle == p_pss->char_diag_info_handle.cccd_handle)) {
@@ -454,6 +457,7 @@ static void onEvtRW(ble_pss_t* p_pss, ble_evt_t* p_ble_evt) {		// handle write e
 			}
 		}
 	}
+	*/
 }
 
 /*
@@ -675,7 +679,7 @@ uint32_t charTxPowerLevelWriteAuthReply(ble_pss_t* p_pss, uint8_t* p_data) {
 	uint32_t err_code = NRF_SUCCESS;
 	uint32_t text;
 
-	if (p_data[0] > 0 && p_data[0] <= 4) {
+	if (p_data[0] > 0 && p_data[0] <= 7) {
 		if (p_data[0] == 1) {
 			text = sd_ble_gap_tx_power_set(NRF51822_TX_POWER_LEVEL_4dBm);
 			if (text == (NRF_SUCCESS)) {
@@ -706,6 +710,30 @@ uint32_t charTxPowerLevelWriteAuthReply(ble_pss_t* p_pss, uint8_t* p_data) {
 				text = NRF51822_TX_POWER_LEVEL_NEG_8dBm;
 				printUSART0("Tx power changed to [%d]dBm\n", &text);
 				TxPowerLevelData[0] = 4;
+			}
+		}
+		else if (p_data[0] == 5) {
+			text = sd_ble_gap_tx_power_set(NRF51822_TX_POWER_LEVEL_NEG_12dBm);
+			if (text == (NRF_SUCCESS)) {
+				text = NRF51822_TX_POWER_LEVEL_NEG_12dBm;
+				printUSART0("Tx power changed to [%d]dBm\n", &text);
+				TxPowerLevelData[0] = 5;
+			}
+		}
+		else if (p_data[0] == 6) {
+			text = sd_ble_gap_tx_power_set(NRF51822_TX_POWER_LEVEL_NEG_16dBm);
+			if (text == (NRF_SUCCESS)) {
+				text = NRF51822_TX_POWER_LEVEL_NEG_16dBm;
+				printUSART0("Tx power changed to [%d]dBm\n", &text);
+				TxPowerLevelData[0] = 6;
+			}
+		}
+		else if (p_data[0] == 7) {
+			text = sd_ble_gap_tx_power_set(NRF51822_TX_POWER_LEVEL_NEG_20dBm);
+			if (text == (NRF_SUCCESS)) {
+				text = NRF51822_TX_POWER_LEVEL_NEG_20dBm;
+				printUSART0("Tx power changed to [%d]dBm\n", &text);
+				TxPowerLevelData[0] = 7;
 			}
 		}
 	}

@@ -154,15 +154,11 @@
 
 static uint16_t                             m_conn_handle = BLE_CONN_HANDLE_INVALID;   /**< Handle of the current connection. */
 static ble_gap_sec_params_t                 m_sec_params;                              /**< Security requirements for this application. */
-static ble_gap_adv_params_t                 m_adv_params;                              /**< Parameters to be passed to the stack when starting advertising. */
+//static ble_gap_adv_params_t                 m_adv_params;                              /**< Parameters to be passed to the stack when starting advertising. */
 static ble_pss_t                            m_pss;
 
 static ble_dfu_t							m_dfus;                                    /**< Structure used to identify the DFU service. */
 static dm_application_instance_t			m_app_handle;                              /**< Application identifier allocated by device manager */
-
-
-// Mode management
-volatile ble_mode_t ble_mode = BLE_SETTINGS_MODE;
 
 volatile uint8_t CharDiagInfoData[6];
 volatile uint8_t CharFirmVerData[3] = { DEVICE_FIRMWARE_VERSION_MAJOR, DEVICE_FIRMWARE_VERSION_MINOR, DEVICE_FIRMWARE_VERSION_REVISION };
@@ -172,12 +168,12 @@ volatile uint8_t TxPowerLevelData[1] = { 0 };
 //Function Prototypes
 void mcuSystemOff(void);
 
-static void advertising_init(void) {	// init advertising data with type of services that can be accessed
+static void advertising_init(void)  {	// init advertising data with type of services that can be accessed
 	uint32_t      err_code;
 	ble_advdata_t advdata;
 	ble_advdata_t scanrsp;
 
-	ble_uuid_t adv_uuids[] = { { BLE_UUID_SERVICE_SENSORS, BLE_UUID_TYPE_BLE },{ BLE_UUID_SERVICE_DIAG, BLE_UUID_TYPE_BLE } };
+	ble_uuid_t adv_uuids[] = { { BLE_UUID_SERVICE_SENSORS, BLE_UUID_TYPE_BLE } };
 	
 	/*
 	ble_advdata_manuf_data_t manuf_data; // Variable to hold manufacturer specific data
@@ -327,7 +323,7 @@ static void power_manage(void)	{
 
 static void on_ble_evt(ble_evt_t * p_ble_evt) {		// handle application's BLE stack events
 	uint32_t err_code;
-	uint32_t utmp32;
+	uint32_t text;
 
 	static ble_gap_sec_keyset_t keys_exchanged;
 
@@ -336,7 +332,7 @@ static void on_ble_evt(ble_evt_t * p_ble_evt) {		// handle application's BLE sta
 			break;
 
 		case BLE_GAP_EVT_CONNECTED:
-			printUSART0("-> BLE: New device connected [%d]\n", &utmp32);
+			printUSART0("-> BLE: New device connected [%d]\n", &text);
 			g_ble_conn = 1;
 
 			//execute appropriate handle function for a given ble service!!!
@@ -344,7 +340,7 @@ static void on_ble_evt(ble_evt_t * p_ble_evt) {		// handle application's BLE sta
 			break;
 
 		case BLE_GAP_EVT_DISCONNECTED:
-			printUSART0("-> BLE: Device disconnected [%d]\n", &utmp32);
+			printUSART0("-> BLE: Device disconnected [%d]\n", &text);
 			g_ble_conn = 0;
 			m_conn_handle = BLE_CONN_HANDLE_INVALID;
 
@@ -609,11 +605,13 @@ void mcuSystemOff() {
 
 int main(void){
 
-	//sd_power_dcdc_mode_set(NRF_POWER_DCDC_ENABLE);
-
 	uint32_t utmp32;
     uint32_t sleep_counter = 0;
 	uint32_t max_counter = 10;
+
+	//Init & Start Watch Dog Timer
+	initWDT();
+	startWDT();
    
 	// Init system modules
 	initGPIO();
@@ -666,8 +664,6 @@ int main(void){
 
 	initTIMER2();
 	startTIMER2();
-	initWDT();
-	startWDT();
 
     while(1) {
         sleep_counter++;
@@ -675,7 +671,7 @@ int main(void){
 		if (g_ble_conn) {
 			sleep_counter = 0;
 			if (CharRockNumData[3] == CHAR_ROCK_NUM_WRITE_BYTE) {
-				uint32_t err_code;
+				//uint32_t err_code;
 				uint32_t data[1];
 
 				data[0] = 0x00;

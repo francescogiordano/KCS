@@ -1,6 +1,5 @@
 #include "usart.h"
 
-
 void initUSART0(uint8_t tx, uint8_t rx, uint32_t baudrate) {
 	// USART0 initialization on tx -> TX & rx -> RX
 	NRF_GPIO->PIN_CNF[tx] = 0x00000001;									// set as output

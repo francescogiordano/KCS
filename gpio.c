@@ -29,7 +29,6 @@ void initGPIO(void) {
 	nrf_gpio_cfg_input(MLX90393_INT_PIN, NRF_GPIO_PIN_PULLDOWN);
 	nrf_gpio_cfg_input(ENABLE_TEST_PIN, NRF_GPIO_PIN_PULLDOWN);
 }
-
 void sleepGPIO(void) {
 	nrf_gpio_cfg_output(MLX90393_INT_PIN);
 	nrf_gpio_pin_clear(MLX90393_INT_PIN);

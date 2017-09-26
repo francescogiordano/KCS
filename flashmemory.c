@@ -28,7 +28,6 @@ uint32_t FlashMemoryPageErase(uint32_t pageOffset, uint32_t count) {
 	}
 	return value;
 }
-
 uint32_t FlashMemoryPageWrite(uint32_t pageOffset, uint32_t* data, uint32_t count) {
 	uint32_t value;
 

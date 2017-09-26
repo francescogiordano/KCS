@@ -7,15 +7,13 @@ static uint8_t serialType = MLX90393_SERIAL_PORT_SPI;
 static uint8_t mlx90393SpiCsPin = 0;
 static bool initializedFlag = 0;
 
-static uint8_t initialStateData[6];
-
 bool initMlx90393(uint8_t type, uint8_t spiCsPin) {
 	uint8_t tx_data[8];
 	uint8_t rx_data[8];
 	uint16_t commandValue;
 	bool errorFlag = 0;
 
-	uint32_t temp = 0;
+	//uint32_t text = 0;
 
 	serialType = type;
 	mlx90393SpiCsPin = spiCsPin;
@@ -39,8 +37,8 @@ bool initMlx90393(uint8_t type, uint8_t spiCsPin) {
 			errorFlag = 1;
 			printUSART0("MLX90393_EXIT_MODE\n", 0);
 		}
-		//temp = rx_data[1];
-		//printUSART0("Exit Mode - Staus Byte: [%h]\n", &temp);
+		//text = rx_data[1];
+		//printUSART0("Exit Mode - Staus Byte: [%h]\n", &text);
 
 		//Test Write IC
 		tx_data[0] = MLX90393_WRITE_REGISTER | 0x0F;		//Command
@@ -53,8 +51,8 @@ bool initMlx90393(uint8_t type, uint8_t spiCsPin) {
 			errorFlag = 1;
 			printUSART0("MLX90393_VOL_MEM_REG_0A\n", 0);
 		}
-		//temp = rx_data[4];
-		//printUSART0("Test Write Register - Status Byte: [%h]\n", &temp);
+		//text = rx_data[4];
+		//printUSART0("Test Write Register - Status Byte: [%h]\n", &text);
 
 		//Test Read IC
 		tx_data[0] = MLX90393_READ_REGISTER;		//Command
@@ -71,12 +69,12 @@ bool initMlx90393(uint8_t type, uint8_t spiCsPin) {
 		if (rx_data[3] != (MLX90393_TEST_VALUE >> 8) && rx_data[4] != (MLX90393_TEST_VALUE & 0x00FF)) {
 			errorFlag = 1;
 
-			temp = rx_data[2];
-			printUSART0("Read Register - Status Byte: [%h]\n", &temp);
-			temp = rx_data[3];
-			printUSART0("Read Register - Data H: [%h]\n", &temp);
-			temp = rx_data[4];
-			printUSART0("Read Register - Data L: [%h]\n", &temp);
+			text = rx_data[2];
+			printUSART0("Read Register - Status Byte: [%h]\n", &text);
+			text = rx_data[3];
+			printUSART0("Read Register - Data H: [%h]\n", &text);
+			text = rx_data[4];
+			printUSART0("Read Register - Data L: [%h]\n", &text);
 		}
 		*/
 
@@ -92,8 +90,8 @@ bool initMlx90393(uint8_t type, uint8_t spiCsPin) {
 			errorFlag = 1;
 			printUSART0("MLX90393_OSR_RES_DIG\n", 0);
 		}
-		//temp = rx_data[4];
-		//printUSART0("Z GAIN HALL - Staus Byte: [%h]\n", &temp);
+		//text = rx_data[4];
+		//printUSART0("Z GAIN HALL - Staus Byte: [%h]\n", &text);
 
 		//Setup Data Rate
 		tx_data[0] = MLX90393_WRITE_REGISTER;		//Command
@@ -106,8 +104,8 @@ bool initMlx90393(uint8_t type, uint8_t spiCsPin) {
 			errorFlag = 1;
 			printUSART0("MLX90393_TRIG_COMM_WOC_TCMP_BURST\n", 0);
 		}
-		//temp = rx_data[4];
-		//printUSART0("Data Rate - Status Byte: [%h]\n", &temp);
+		//text = rx_data[4];
+		//printUSART0("Data Rate - Status Byte: [%h]\n", &text);
 
 		//Setup Sampling Rate
 		tx_data[0] = MLX90393_WRITE_REGISTER;		//Command
@@ -121,8 +119,8 @@ bool initMlx90393(uint8_t type, uint8_t spiCsPin) {
 			errorFlag = 1;
 			printUSART0("MLX90393_OSR_RES_DIG\n", 0);
 		}
-		//temp = rx_data[4];
-		//printUSART0("Sample Rate - Staus Byte: [%h]\n", &temp);
+		//text = rx_data[4];
+		//printUSART0("Sample Rate - Staus Byte: [%h]\n", &text);
 
 	}
 	else {

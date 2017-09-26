@@ -61,29 +61,18 @@ typedef struct ble_pss_s												// various status information for the servic
     bool                          is_notification_supported;      		// true if notification is supported.
     uint8_t                    	  uuid_type;
 } ble_pss_t;
-typedef enum
-{
-
-    BLE_LAUNCH_MODE = 0,
-    //BLE_STICK_MODE=1,
-    BLE_FREE_MODE=2,
-    BLE_OTHER_MODE=3,
-    BLE_SETTINGS_MODE=4,
-    BLE_CALIB_AXIS_MODE=5,
-} ble_mode_t;
-
 
 #define BLE_UUID_VENDOR {0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
 
 #define BLE_UUID_SERVICE_SENSORS		    0x2000
 
-/*
+/**/
 #define BLE_UUID_CHAR_SENSORS_DATA		 	0x2100
-#define BLE_UUID_CHAR_SENSORS_DATA_NOTIFY	0x2101
 #define CHAR_SENSORS_DATA_VER_LEN			10
 
+#define BLE_UUID_CHAR_SENSORS_DATA_NOTIFY	0x2101
+
 #define BLE_UUID_CHAR_DIAG_INFO				0x2200
-#define BLE_UUID_CHAR_DIAG_WRITE	 		0x2201
 #define CHAR_DIAG_INFO_LEN					6
 
 #define BLE_UUID_CHAR_FIRM_VER				0x2300
@@ -94,10 +83,10 @@ typedef enum
 #define CHAR_ROCK_NUM_WRITE_BYTE			0x99
 
 #define BLE_UUID_CHAR_TX_POWER_LEVEL		0x2500
-#define CHAR_ROCK_NUM_LEN					1
-*/
+#define CHAR_TX_POWER_LEVEL_LEN				1
+/**/
 
-
+/*
 #define BLE_UUID_CHAR_SENSORS_DATA		 	0x2E00
 #define BLE_UUID_CHAR_SENSORS_DATA_NOTIFY	0x2E01
 #define CHAR_SENSORS_DATA_VER_LEN			10
@@ -118,16 +107,7 @@ typedef enum
 
 #define BLE_UUID_CHAR_TX_POWER_LEVEL		0x3201
 #define CHAR_TX_POWER_LEVEL_LEN				1
-
-
-#define SETTINGS_MODE                   0x01
-#define SETTINGS_NEW                    0x03
-
-#define LAUNCH_MODE                     0x05
-#define STICK_MODE                      0x0B
-#define FREE_MODE                       0x0D
-#define CALIB_AXIS                      0x0F
-#define POWER_DOWN_CORRECT              0x11
+*/
 
 #define NRF51822_TX_POWER_LEVEL_NEG_20dBm	-20
 #define NRF51822_TX_POWER_LEVEL_NEG_16dBm	-16
@@ -137,9 +117,7 @@ typedef enum
 #define NRF51822_TX_POWER_LEVEL_0dBm		0											// accepted values are -40, -30, -20, -16, -12, -8, -4, 0, and 4 dBm).
 #define NRF51822_TX_POWER_LEVEL_4dBm		4
 
-
 uint32_t initServiceSensors(ble_pss_t * p_pss, const ble_pss_init_t * p_pss_init);
-
 
 static uint32_t addCharSensorsData(ble_pss_t * p_pss, const ble_pss_init_t * p_pss_init);
 static uint32_t addCharSensorsDataNotify(ble_pss_t * p_pss, const ble_pss_init_t * p_pss_init);
@@ -150,12 +128,10 @@ static uint32_t addCharTxPowerLevel(ble_pss_t * p_pss, const ble_pss_init_t * p_
 
 void onBleEvtKCS(ble_pss_t * p_pss, ble_evt_t * p_ble_evt);
 
-
 static void onEvtConn(ble_pss_t* , ble_evt_t* );
 static void onEvtDisc(ble_pss_t* , ble_evt_t* );
 static void onEvtWrite(ble_pss_t* , ble_evt_t* );
 static void onEvtRW(ble_pss_t* , ble_evt_t* );
-
 
 uint32_t updateCharSensorsData(ble_pss_t * p_pss);
 uint32_t updateCharDiagInfo(ble_pss_t* );
@@ -173,8 +149,6 @@ extern volatile uint8_t CharRockNumData[4];
 extern volatile uint8_t TxPowerLevelData[1];
 
 extern volatile uint8_t g_ble_conn;
-extern volatile ble_mode_t ble_mode;
-
 extern volatile uint8_t g_power_down;
 
 #endif

@@ -50,88 +50,8 @@ double toDouble(uint8_t high, uint8_t low) {
 	}
 	return (double) shortVal;
 }
-double toDoubleError(uint8_t low, uint8_t high, uint8_t sign, uint16_t value) {
-	uint16_t conversion_form;
-	double double_form;
-
-	conversion_form = (uint16_t)low | ((uint16_t)(high) << 8);
-	short shortVal = (short) conversion_form;
-	
-	if (sign > 0) {
-		double_form = (double) (shortVal) - (double)value;
-	} else {
-		double_form = (double) (shortVal) + (double)value;
-	}
-
-	if (double_form < 0) {
-		double_form *= -1;
-	}
-
-	return double_form;
-}
-
-uint16_t toUint16Error(uint8_t low, uint8_t high, uint8_t sign, uint16_t value) {
-	uint16_t conversion_form;
-
-	conversion_form = (uint16_t)low | ((uint16_t)(high) << 8);
-	short shortVal = (short) conversion_form;
-
-	if (sign > 0) {
-		shortVal = shortVal - value;
-	} else {
-		shortVal = shortVal + value;
-	}
-
-	if (shortVal<0) {
-		return (uint16_t) (shortVal*-1);
-	}
-	return (uint16_t) shortVal;
-}
-uint16_t toUint16(uint8_t low, uint8_t high) {
-	uint16_t conversion_form;
-
-	conversion_form = (uint16_t)low | ((uint16_t)(high) << 8);
-	short shortVal = (short) conversion_form;
-	if (shortVal<0) {
-		return (uint16_t) (shortVal*-1);
-	}
-	return (uint16_t) shortVal;
-}
-
-uint16_t getSign(uint8_t low, uint8_t high) {
-	uint16_t conversion_form;
-
-	conversion_form = (uint16_t)low | ((uint16_t)(high) << 8);
-	short shortVal = (short) conversion_form;
-
-	if (shortVal<0) {
-		return 0;
-	}
-	return 1;
-}
-uint16_t getSignError(uint8_t low, uint8_t high, uint8_t sign, uint16_t value) {
-	uint16_t conversion_form;
-
-	conversion_form = (uint16_t)low | ((uint16_t)(high) << 8);
-	short shortVal = (short) conversion_form;
-
-	if (sign > 0) {
-		shortVal = shortVal - value;
-	} else {
-		shortVal = shortVal + value;
-	}
-
-	if (shortVal<0) {
-		return 0;
-	}
-	return 1;
-}
-
 double pythagore3(double a, double b, double c) {
 	return sqrt((a*a) + (b*b) + (c*c));
-}
-double pythagore2(double a, double b) {
-	return sqrt((a*a) + (b*b));
 }
 
 void getDataSENSOR(uint8_t* sensorData) {
