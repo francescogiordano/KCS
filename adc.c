@@ -57,7 +57,6 @@ uint16_t GetAdcValue() {
 	NRF_ADC->TASKS_STOP = 1;
 
 	//Disable ADC
-	//NRF_ADC->ENABLE = ADC_ENABLE_ENABLE_Disabled;
 	DisableAdc();
 
 	return result;

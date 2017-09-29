@@ -516,11 +516,11 @@ uint32_t updateCharDiagInfo(ble_pss_t* p_pss)
 	CharDiagInfoData[3] = adcResult & 0x00FF;					//Battery Actual Value
 
 	/*
-	uint32_t text = 0;
-	text = CharDiagInfoData[2];
-	printUSART0("-> Battery Level Percent: [%h]\n", &text);
-	text = CharDiagInfoData[3];
-	printUSART0("-> ADC Value - Max 0xFF: [%h]\n", &text);
+	uint32_t printValue = 0;
+	printValue = CharDiagInfoData[2];
+	printUSART0("-> Battery Level Percent: [%h]\n", &printValue);
+	printValue = CharDiagInfoData[3];
+	printUSART0("-> ADC Value - Max 0xFF: [%h]\n", &printValue);
 	*/
 
 	getTempData(tempData);
@@ -529,8 +529,8 @@ uint32_t updateCharDiagInfo(ble_pss_t* p_pss)
 	CharDiagInfoData[4] = tempData[1];	//tempData[1] = TEMP_H
 	CharDiagInfoData[5] = tempData[0];	//tempData[0] = TEMP_L
 
-	//temp = CharDiagInfoData[4]*256 + CharDiagInfoData[5];
-	//printUSART0("Temperature Level: [%h]\n", &temp);
+	//printValue = CharDiagInfoData[4]*256 + CharDiagInfoData[5];
+	//printUSART0("Temperature Level: [%h]\n", &printValue);
 
 	ble_gatts_hvx_params_t hvx_params;
 	memset(&hvx_params, 0, sizeof(hvx_params));
@@ -623,20 +623,9 @@ uint32_t charRockNumReadAuthReply(ble_pss_t* p_pss) {
 }
 uint32_t charRockNumWriteAuthReply(ble_pss_t* p_pss, uint8_t* p_data) {
 	uint32_t err_code = NRF_SUCCESS;
+	uint32_t printValue;
 
-	uint32_t text;
-	text = p_data[3];
-	printUSART0("RockNum[3]: [%h]\n", &text);
-
-	if (p_data[3] == CHAR_ROCK_NUM_WRITE_BYTE) {		
-		/*
-		temp = p_data[0];
-		printUSART0("RockNum[0]: [%h]\n", &text);
-		temp = p_data[1];
-		printUSART0("RockNum[1]: [%h]\n", &text);
-		temp = p_data[2];
-		printUSART0("RockNum[2]: [%h]\n", &text);
-		*/
+	if (p_data[3] == CHAR_ROCK_NUM_WRITE_BYTE) {
 		CharRockNumData[0] = p_data[0];
 		CharRockNumData[1] = p_data[1];
 		CharRockNumData[2] = p_data[2];
@@ -677,62 +666,62 @@ uint32_t charTxPowerLevelReadAuthReply(ble_pss_t* p_pss) {
 }
 uint32_t charTxPowerLevelWriteAuthReply(ble_pss_t* p_pss, uint8_t* p_data) {
 	uint32_t err_code = NRF_SUCCESS;
-	uint32_t text;
+	uint32_t printValue;
 
 	if (p_data[0] > 0 && p_data[0] <= 7) {
 		if (p_data[0] == 1) {
-			text = sd_ble_gap_tx_power_set(NRF51822_TX_POWER_LEVEL_4dBm);
-			if (text == (NRF_SUCCESS)) {
-				text = NRF51822_TX_POWER_LEVEL_4dBm;
-				printUSART0("Tx power changed to [%d]dBm\n", &text);
+			err_code = sd_ble_gap_tx_power_set(NRF51822_TX_POWER_LEVEL_4dBm);
+			if (err_code == (NRF_SUCCESS)) {
+				printValue = NRF51822_TX_POWER_LEVEL_4dBm;
+				printUSART0("Tx power changed to [%d]dBm\n", &printValue);
 				TxPowerLevelData[0] = 1;
 			}
 		}
 		else if (p_data[0] == 2) {
-			text = sd_ble_gap_tx_power_set(NRF51822_TX_POWER_LEVEL_0dBm);
-			if (text == (NRF_SUCCESS)) {
-				text = NRF51822_TX_POWER_LEVEL_0dBm;
-				printUSART0("Tx power changed to [%d]dBm\n", &text);
+			err_code = sd_ble_gap_tx_power_set(NRF51822_TX_POWER_LEVEL_0dBm);
+			if (err_code == (NRF_SUCCESS)) {
+				printValue = NRF51822_TX_POWER_LEVEL_0dBm;
+				printUSART0("Tx power changed to [%d]dBm\n", &printValue);
 				TxPowerLevelData[0] = 2;
 			}
 		}
 		else if (p_data[0] == 3) {
-			text = sd_ble_gap_tx_power_set(NRF51822_TX_POWER_LEVEL_NEG_4dBm);
-			if (text == (NRF_SUCCESS)) {
-				text = NRF51822_TX_POWER_LEVEL_NEG_4dBm;
-				printUSART0("Tx power changed to [%d]dBm\n", &text);
+			err_code = sd_ble_gap_tx_power_set(NRF51822_TX_POWER_LEVEL_NEG_4dBm);
+			if (err_code == (NRF_SUCCESS)) {
+				printValue = NRF51822_TX_POWER_LEVEL_NEG_4dBm;
+				printUSART0("Tx power changed to [%d]dBm\n", &printValue);
 				TxPowerLevelData[0] = 3;
 			}
 		}
 		else if (p_data[0] == 4) {
-			text = sd_ble_gap_tx_power_set(NRF51822_TX_POWER_LEVEL_NEG_8dBm);
-			if (text == (NRF_SUCCESS)) {
-				text = NRF51822_TX_POWER_LEVEL_NEG_8dBm;
-				printUSART0("Tx power changed to [%d]dBm\n", &text);
+			err_code = sd_ble_gap_tx_power_set(NRF51822_TX_POWER_LEVEL_NEG_8dBm);
+			if (err_code == (NRF_SUCCESS)) {
+				printValue = NRF51822_TX_POWER_LEVEL_NEG_8dBm;
+				printUSART0("Tx power changed to [%d]dBm\n", &printValue);
 				TxPowerLevelData[0] = 4;
 			}
 		}
 		else if (p_data[0] == 5) {
-			text = sd_ble_gap_tx_power_set(NRF51822_TX_POWER_LEVEL_NEG_12dBm);
-			if (text == (NRF_SUCCESS)) {
-				text = NRF51822_TX_POWER_LEVEL_NEG_12dBm;
-				printUSART0("Tx power changed to [%d]dBm\n", &text);
+			err_code = sd_ble_gap_tx_power_set(NRF51822_TX_POWER_LEVEL_NEG_12dBm);
+			if (err_code == (NRF_SUCCESS)) {
+				printValue = NRF51822_TX_POWER_LEVEL_NEG_12dBm;
+				printUSART0("Tx power changed to [%d]dBm\n", &printValue);
 				TxPowerLevelData[0] = 5;
 			}
 		}
 		else if (p_data[0] == 6) {
-			text = sd_ble_gap_tx_power_set(NRF51822_TX_POWER_LEVEL_NEG_16dBm);
-			if (text == (NRF_SUCCESS)) {
-				text = NRF51822_TX_POWER_LEVEL_NEG_16dBm;
-				printUSART0("Tx power changed to [%d]dBm\n", &text);
+			err_code = sd_ble_gap_tx_power_set(NRF51822_TX_POWER_LEVEL_NEG_16dBm);
+			if (err_code == (NRF_SUCCESS)) {
+				printValue = NRF51822_TX_POWER_LEVEL_NEG_16dBm;
+				printUSART0("Tx power changed to [%d]dBm\n", &printValue);
 				TxPowerLevelData[0] = 6;
 			}
 		}
 		else if (p_data[0] == 7) {
-			text = sd_ble_gap_tx_power_set(NRF51822_TX_POWER_LEVEL_NEG_20dBm);
-			if (text == (NRF_SUCCESS)) {
-				text = NRF51822_TX_POWER_LEVEL_NEG_20dBm;
-				printUSART0("Tx power changed to [%d]dBm\n", &text);
+			err_code = sd_ble_gap_tx_power_set(NRF51822_TX_POWER_LEVEL_NEG_20dBm);
+			if (err_code == (NRF_SUCCESS)) {
+				printValue = NRF51822_TX_POWER_LEVEL_NEG_20dBm;
+				printUSART0("Tx power changed to [%d]dBm\n", &printValue);
 				TxPowerLevelData[0] = 7;
 			}
 		}

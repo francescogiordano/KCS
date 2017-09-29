@@ -112,11 +112,11 @@
 #define SCHED_MAX_EVENT_DATA_SIZE			sizeof(app_timer_event_t)                   /**< Maximum size of scheduler events. Note that scheduler BLE stack events do not contain any data, as the events are being pulled from the stack in the event handler. */
 #define SCHED_QUEUE_SIZE					20                                          /**< Maximum number of events in the scheduler queue. */
 
-#define DEVICE_NAME                         "Francesco"
-//#define DEVICE_NAME                       "Klutch Curling Sensor"					/**< Name of device. Will be included in the advertising data. */
+//#define DEVICE_NAME                         "Francesco"
+#define DEVICE_NAME                       "Klutch Curling Sensor"					/**< Name of device. Will be included in the advertising data. */
 #define DEVICE_FIRMWARE_VERSION_MAJOR		0x01
 #define DEVICE_FIRMWARE_VERSION_MINOR		0x02
-#define DEVICE_FIRMWARE_VERSION_REVISION	0x00
+#define DEVICE_FIRMWARE_VERSION_REVISION	0x02
 #define MANUFACTURER_NAME                   "nRF51822"                     			/**< Manufacturer. Will be passed to Device Information Service. */
 #define APP_ADV_INTERVAL                    64                                         /**< The advertising interval (in units of 0.625 ms. This value corresponds to 25 ms). */
 #define APP_ADV_TIMEOUT_180_SECONDS         180                                        /**< The advertising timeout in units of seconds. */
@@ -323,7 +323,7 @@ static void power_manage(void)	{
 
 static void on_ble_evt(ble_evt_t * p_ble_evt) {		// handle application's BLE stack events
 	uint32_t err_code;
-	uint32_t text;
+	uint32_t printValue;
 
 	static ble_gap_sec_keyset_t keys_exchanged;
 
@@ -332,7 +332,7 @@ static void on_ble_evt(ble_evt_t * p_ble_evt) {		// handle application's BLE sta
 			break;
 
 		case BLE_GAP_EVT_CONNECTED:
-			printUSART0("-> BLE: New device connected [%d]\n", &text);
+			printUSART0("-> BLE: New device connected [%d]\n", &printValue);
 			g_ble_conn = 1;
 
 			//execute appropriate handle function for a given ble service!!!
@@ -340,13 +340,9 @@ static void on_ble_evt(ble_evt_t * p_ble_evt) {		// handle application's BLE sta
 			break;
 
 		case BLE_GAP_EVT_DISCONNECTED:
-			printUSART0("-> BLE: Device disconnected [%d]\n", &text);
+			printUSART0("-> BLE: Device disconnected [%d]\n", &printValue);
 			g_ble_conn = 0;
 			m_conn_handle = BLE_CONN_HANDLE_INVALID;
-
-			//Francesco
-			//On disconnect we will not advertise we will only advertise on wake
-			//advertising_start();
 			break;
 
 		case BLE_GAP_EVT_SEC_PARAMS_REQUEST:
@@ -359,7 +355,6 @@ static void on_ble_evt(ble_evt_t * p_ble_evt) {		// handle application's BLE sta
 			printUSART0("-> BLE: GAP timeout - nRF51 sleeping...\n", 0);
 			if (p_ble_evt->evt.gap_evt.params.timeout.src == BLE_GAP_TIMEOUT_SRC_ADVERTISING) {
 				mcuSystemOff();
-				APP_ERROR_CHECK(err_code);
 			}
 			break;
 
@@ -605,9 +600,10 @@ void mcuSystemOff() {
 
 int main(void){
 
-	uint32_t utmp32;
-    uint32_t sleep_counter = 0;
-	uint32_t max_counter = 10;
+	uint32_t err_code;
+	uint32_t printValue;
+    uint32_t sleepCounter = 0;
+	uint32_t maxCounter = 10;
 
 	//Init & Start Watch Dog Timer
 	initWDT();
@@ -620,19 +616,31 @@ int main(void){
     initUSART0(UART_TX_PIN, UART_RX_PIN, USAR0_BAUDRATE_115200);
 	initSPI0(SPI_DATARATE_4Mbps);
 
-	printUSART0("\n\nwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww\n", 0);
-	printUSART0("Starting BLE Klutch Curling Sensor\n", 0);
-	printUSART0("DEVICE NAME: ", 0);
+	printUSART0("\n\nStarting BLE KCS...\n", 0);
+	printUSART0("Device Name: ", 0);
 	printUSART0(DEVICE_NAME, 0);
-	printUSART0("\nwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww\n", 0);
+	printUSART0("\n", 0);
 
 	//ENABLE_TEST_PIN active high will enter "TEST MODE"
 	if (nrf_gpio_pin_read(ENABLE_TEST_PIN)) {
 		printUSART0("Entered Test Mode\n", 0);
 		while (nrf_gpio_pin_read(ENABLE_TEST_PIN)) {
 			if (readCharUSART0() == 0x61) {
+				
+				//Test Mag & Accel IC
 				initSensors();
+
+				//Test ADC
+				uint32_t value = GetAdcValue();
+				if (value >= 156 && value <= 163) {
+					printUSART0("R7 ADC [OK]\n", 0);
+				}
+				else {
+					//printUSART0("R7 ADC [FAIL][%d]\n", &value);
+					printUSART0("R7 ADC [FAIL]\n", 0);
+				}
 			}
+			tickleWDT();
 		}
 	}
 
@@ -644,10 +652,10 @@ int main(void){
     scheduler_init();
     gap_params_init();
 
-    utmp32 = sd_ble_gap_tx_power_set(NRF51822_TX_POWER_LEVEL_NEG_8dBm);
-    if(utmp32 == (NRF_SUCCESS)) {
-		utmp32 = NRF51822_TX_POWER_LEVEL_NEG_8dBm;
-		printUSART0("Tx power changed to [%d]dBm\n",&utmp32);
+	err_code = sd_ble_gap_tx_power_set(NRF51822_TX_POWER_LEVEL_NEG_8dBm);
+    if(err_code == (NRF_SUCCESS)) {
+		printValue = NRF51822_TX_POWER_LEVEL_NEG_8dBm;
+		printUSART0("Tx power changed to [%d]dBm\n",&printValue);
 		TxPowerLevelData[0] = 4;
 	}
 	else {
@@ -666,12 +674,11 @@ int main(void){
 	startTIMER2();
 
     while(1) {
-        sleep_counter++;
+        sleepCounter++;
 
 		if (g_ble_conn) {
-			sleep_counter = 0;
+			sleepCounter = 0;
 			if (CharRockNumData[3] == CHAR_ROCK_NUM_WRITE_BYTE) {
-				//uint32_t err_code;
 				uint32_t data[1];
 
 				data[0] = 0x00;
@@ -686,8 +693,8 @@ int main(void){
 				mcuSystemOff();
 			}
 		}
-		else if (sleep_counter >= max_counter) {
-			sleep_counter = 0;
+		else if (sleepCounter >= maxCounter) {
+			sleepCounter = 0;
 			mcuSystemOff();
 		}
 		tickleWDT();

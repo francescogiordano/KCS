@@ -66,7 +66,6 @@ typedef struct ble_pss_s												// various status information for the servic
 
 #define BLE_UUID_SERVICE_SENSORS		    0x2000
 
-/**/
 #define BLE_UUID_CHAR_SENSORS_DATA		 	0x2100
 #define CHAR_SENSORS_DATA_VER_LEN			10
 
@@ -84,7 +83,6 @@ typedef struct ble_pss_s												// various status information for the servic
 
 #define BLE_UUID_CHAR_TX_POWER_LEVEL		0x2500
 #define CHAR_TX_POWER_LEVEL_LEN				1
-/**/
 
 /*
 #define BLE_UUID_CHAR_SENSORS_DATA		 	0x2E00
