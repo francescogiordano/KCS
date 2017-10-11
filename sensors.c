@@ -81,6 +81,7 @@ void getDataSENSOR(uint8_t* sensorData) {
 	sensorData[14] = 0;
 	*/
 	if (getMagData(tempData) == 0) {
+		//XH,XL,YH,YL,ZH,ZL
 
 		/*
 		sensorData[9] = tempData[0];		//X_H
@@ -92,71 +93,37 @@ void getDataSENSOR(uint8_t* sensorData) {
 		*/
 
 		/*
-		uint32_t temp;
-		temp = tempData[0];
-		printUSART0("XH: [%h]\n", &temp);
-		temp = tempData[1];
-		printUSART0("XL: [%h]\n", &temp);
-
-		temp = tempData[2];
-		printUSART0("YH: [%h]\n", &temp);
-		temp = tempData[3];
-		printUSART0("YL: [%h]\n", &temp);
-
-		temp = tempData[4];
-		printUSART0("ZH: [%h]\n", &temp);
-		temp = tempData[5];
-		printUSART0("ZL: [%h]\n", &temp);
-		*/
-
 		if ((tempData[0] & 0x80) == 0x80) {
 			tempConversion = tempData[0] * 256 + tempData[1];
 			tempConversion = (tempConversion ^ 0xFFFF) + 1;
-			tempData[0] = tempConversion >> 8;
-			tempData[1] = tempConversion & 0x00FF;
+			tempData[0] = tempConversion >> 8;					//XH
+			tempData[1] = tempConversion & 0x00FF;				//XL
 		}
 
 		if ((tempData[2] & 0x80) == 0x80) {
 			tempConversion = tempData[2] * 256 + tempData[3];
 			tempConversion = (tempConversion ^ 0xFFFF) + 1;
-			tempData[2] = tempConversion >> 8;
-			tempData[3] = tempConversion & 0x00FF;
+			tempData[2] = tempConversion >> 8;					//YH
+			tempData[3] = tempConversion & 0x00FF;				//YL
 		}
 
 		if ((tempData[4] & 0x80) == 0x80) {
 			tempConversion = tempData[4] * 256 + tempData[5];
 			tempConversion = (tempConversion ^ 0xFFFF) + 1;
-			tempData[4] = tempConversion >> 8;
-			tempData[5] = tempConversion & 0x00FF;
+			tempData[4] = tempConversion >> 8;					//ZH
+			tempData[5] = tempConversion & 0x00FF;				//ZL
 		}
-
-		/*
-		temp = tempData[0];
-		printUSART0("+XH: [%h]\n", &temp);
-		temp = tempData[1];
-		printUSART0("+XL: [%h]\n", &temp);
-
-		temp = tempData[2];
-		printUSART0("+YH: [%h]\n", &temp);
-		temp = tempData[3];
-		printUSART0("+YL: [%h]\n", &temp);
-
-		temp = tempData[4];
-		printUSART0("+ZH: [%h]\n", &temp);
-		temp = tempData[5];
-		printUSART0("+ZL: [%h]\n", &temp);
-		*/
 
 		//conversion_form = pythagore3(toDouble(tempData[0], tempData[1]) / 16, toDouble(tempData[2], tempData[3]) / 16, toDouble(tempData[4], tempData[5]) / 16);
 		conversion_form = pythagore3(toDouble(tempData[0], tempData[1]), toDouble(tempData[2], tempData[3]), toDouble(tempData[4], tempData[5]));
 
-		/*
-		temp = conversion_form;
-		printUSART0("conversion_form: [%h]\n", &temp);
 		*/
 
-		sensorData[0] = conversion_form & 0xFF;			//Conversion Mag L
-		sensorData[1] = conversion_form >> 8 & 0xFF;		//Conversion Mag H
+		//sensorData[0] = conversion_form & 0xFF;			//Conversion Mag L
+		//sensorData[1] = (conversion_form >> 8) & 0xFF;		//Conversion Mag H
+
+		sensorData[0] = tempData[4];		//Conversion Mag ZH
+		sensorData[1] = tempData[5];		//Conversion Mag ZL
 	}
 	if (getAccelData(tempData) == 0) {
 		sensorData[2] = tempData[2];		//tempData[2] = Y_L
@@ -202,7 +169,7 @@ bool getGyroData(uint8_t* gyroDataPtr) {
 bool getMagData(uint8_t* magDataPtr) {
 	bool errorFlag = 1;
 
-	errorFlag = getMlx90393MagData(magDataPtr);
+	errorFlag = getMlx90393MagData(magDataPtr);		////XH,XL,YH,YL,ZH,ZL
 
 	return errorFlag;
 }

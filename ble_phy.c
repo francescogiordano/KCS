@@ -476,6 +476,22 @@ double pythagore3Fra(double a, double b, double c) {
 }
 */
 
+void UpdateCharDiagInfoDataBatTemp(void) {
+	uint32_t adcResult = 0;
+	uint8_t	tempData[2] = { 0 };
+
+	adcResult = GetAdcValue();		//Battery max level read 7.2V = 1.2 (referencec) * 3 (1/3 prescaling) * 2 (resistor divider)
+
+	CharDiagInfoData[2] = ((adcResult & 0X00FF) * 0x64) / 0xFF;	//Battery Percentage Value
+	CharDiagInfoData[3] = adcResult & 0x00FF;					//Battery Actual Value
+
+	getTempData(tempData);
+
+	//0x00 = 25 deg C - 256bit/deg C
+	CharDiagInfoData[4] = tempData[1];	//tempData[1] = TEMP_H
+	CharDiagInfoData[5] = tempData[0];	//tempData[0] = TEMP_L
+}
+
 uint32_t updateCharSensorsData(ble_pss_t* p_pss)
 {
     uint32_t err_code = NRF_SUCCESS;
@@ -507,13 +523,7 @@ uint32_t updateCharDiagInfo(ble_pss_t* p_pss)
 	uint32_t err_code = NRF_SUCCESS;
 	uint16_t len = (CHAR_DIAG_INFO_LEN);
 
-	uint32_t adcResult = 0;
-	uint8_t	tempData[2] = { 0 };
-
-	adcResult = GetAdcValue();		//Battery max level read 7.2V = 1.2 (referencec) * 3 (1/3 prescaling) * 2 (resistor divider)
-
-	CharDiagInfoData[2] = ((adcResult & 0X00FF) * 0x64) / 0xFF;	//Battery Percentage Value
-	CharDiagInfoData[3] = adcResult & 0x00FF;					//Battery Actual Value
+	UpdateCharDiagInfoDataBatTemp();
 
 	/*
 	uint32_t printValue = 0;
@@ -522,15 +532,6 @@ uint32_t updateCharDiagInfo(ble_pss_t* p_pss)
 	printValue = CharDiagInfoData[3];
 	printUSART0("-> ADC Value - Max 0xFF: [%h]\n", &printValue);
 	*/
-
-	getTempData(tempData);
-
-	//0x00 = 25 deg C - 256bit/deg C
-	CharDiagInfoData[4] = tempData[1];	//tempData[1] = TEMP_H
-	CharDiagInfoData[5] = tempData[0];	//tempData[0] = TEMP_L
-
-	//printValue = CharDiagInfoData[4]*256 + CharDiagInfoData[5];
-	//printUSART0("Temperature Level: [%h]\n", &printValue);
 
 	ble_gatts_hvx_params_t hvx_params;
 	memset(&hvx_params, 0, sizeof(hvx_params));

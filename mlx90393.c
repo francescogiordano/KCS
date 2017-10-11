@@ -191,7 +191,7 @@ bool getMlx90393MagData(uint8_t* magDataPtr) {
 				errorFlag = 0;
 
 				for (int i = 0; i < 6; i++) {
-						magDataPtr[i] = rx_data[i + 2];
+						magDataPtr[i] = rx_data[i + 2];		//XH,XL,YH,YL,ZH,ZL
 				}
 			}
 		}

@@ -112,11 +112,12 @@
 #define SCHED_MAX_EVENT_DATA_SIZE			sizeof(app_timer_event_t)                   /**< Maximum size of scheduler events. Note that scheduler BLE stack events do not contain any data, as the events are being pulled from the stack in the event handler. */
 #define SCHED_QUEUE_SIZE					20                                          /**< Maximum number of events in the scheduler queue. */
 
+//#define DEVICE_NAME                         "PaulTheBest"
 //#define DEVICE_NAME                         "Francesco"
 #define DEVICE_NAME                       "Klutch Curling Sensor"					/**< Name of device. Will be included in the advertising data. */
 #define DEVICE_FIRMWARE_VERSION_MAJOR		0x01
 #define DEVICE_FIRMWARE_VERSION_MINOR		0x02
-#define DEVICE_FIRMWARE_VERSION_REVISION	0x02
+#define DEVICE_FIRMWARE_VERSION_REVISION	0x04
 #define MANUFACTURER_NAME                   "nRF51822"                     			/**< Manufacturer. Will be passed to Device Information Service. */
 #define APP_ADV_INTERVAL                    64                                         /**< The advertising interval (in units of 0.625 ms. This value corresponds to 25 ms). */
 #define APP_ADV_TIMEOUT_180_SECONDS         180                                        /**< The advertising timeout in units of seconds. */
@@ -183,6 +184,8 @@ static void advertising_init(void)  {	// init advertising data with type of serv
 	manuf_data.data.size = sizeof(data);
 	*/
 
+	UpdateCharDiagInfoDataBatTemp();
+
 	uint32_t* flashMemory;
 	flashMemory = GetFlashMemoryStartAddress();
 
@@ -191,24 +194,20 @@ static void advertising_init(void)  {	// init advertising data with type of serv
 	CharRockNumData[2] = flashMemory[0] >> 8;
 	CharRockNumData[3] = 0x00;
 
-	/*
-	uint32_t temp;
-	temp = CharRockNumData[0];
-	printUSART0("AdRockNum[0]: [%h]\n", &temp);
-	temp = CharRockNumData[1];
-	printUSART0("AdRockNum[1]: [%h]\n", &temp);
-	temp = CharRockNumData[2];
-	printUSART0("AdRockNum[2]: [%h]\n", &temp);
-	temp = CharRockNumData[3];
-	printUSART0("AdRockNum[3]: [%h]\n", &temp);
-	*/
-
-	uint8_t data[4];
+	uint8_t data[10];
 	
 	data[0] = CharRockNumData[0];
 	data[1] = CharRockNumData[1];
 	data[2] = CharRockNumData[2];
 	data[3] = CharRockNumData[3];
+
+	data[4] = CharDiagInfoData[0];
+	data[5] = CharDiagInfoData[1];
+	data[6] = CharDiagInfoData[2];
+
+	data[7] = CharDiagInfoData[3];
+	data[8] = CharDiagInfoData[4];
+	data[9] = CharDiagInfoData[5];
 
 	ble_advdata_service_data_t service_data;
 	service_data.service_uuid = BLE_UUID_CHAR_ROCK_NUMBER;
@@ -645,7 +644,6 @@ int main(void){
 	}
 
 	initSensors();
-
     timers_init();
     ble_stack_init();
     device_manager_init(0);

@@ -120,6 +120,7 @@ bool sleepLsm6dsl(void) {
 			//Wake up threshold
 			tx_data[0] = (LSM6DSL_WAKE_UP_THS | SPI_WRITE_DATA);
 			tx_data[1] = (LSM6DSL_WK_THS_1_PER);
+			//tx_data[1] = (LSM6DSL_WK_THS_5_PER);
 			if (rxtxSPI0(2, tx_data, rx_data, lsm6dslSpiCsPin)) {		//Check if SPI communication
 				errorFlag = 1;
 			}

@@ -131,6 +131,7 @@ static void onEvtDisc(ble_pss_t* , ble_evt_t* );
 static void onEvtWrite(ble_pss_t* , ble_evt_t* );
 static void onEvtRW(ble_pss_t* , ble_evt_t* );
 
+void UpdateCharDiagInfoDataBatTemp(void);
 uint32_t updateCharSensorsData(ble_pss_t * p_pss);
 uint32_t updateCharDiagInfo(ble_pss_t* );
 
