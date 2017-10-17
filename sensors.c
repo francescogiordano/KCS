@@ -126,13 +126,14 @@ void getDataSENSOR(uint8_t* sensorData) {
 		sensorData[1] = tempData[5];		//Conversion Mag ZL
 	}
 	if (getAccelData(tempData) == 0) {
-		sensorData[2] = tempData[2];		//tempData[2] = Y_L
-		sensorData[3] = tempData[3];		//tempData[3] = Y_H
+		sensorData[2] = tempData[1];		//tempData[3] = Accel XH
+		sensorData[3] = tempData[0];		//tempData[2] = Accel XL
 
-		sensorData[4] = tempData[0];		//tempData[0] = X_L
-		sensorData[5] = tempData[1];		//tempData[1] = X_H
+		sensorData[4] = tempData[3];		//tempData[1] = Accel YH
+		sensorData[5] = tempData[2];		//tempData[0] = Accel YL
 
-											//tempData[4,5] = Z_L,Z_H
+											//tempData[5] = Accel ZH
+											//tempData[4] = Accel ZL
 
 		//uint32_t temp = tempData[3]*256 + tempData[2];
 		//printUSART0("%d\n", &temp);
@@ -144,8 +145,8 @@ void getDataSENSOR(uint8_t* sensorData) {
 		sensorData[6] = conversion_form & 0xFF;
 		sensorData[7] = (conversion_form >> 8);
 		*/
-		sensorData[6] = tempData[4];		//GYRO Z_L  
-		sensorData[7] = tempData[5];		//GYRO Z_H
+		sensorData[6] = tempData[5];		//GYRO Z_H  
+		sensorData[7] = tempData[4];		//GYRO Z_L
 
 		//uint32_t temp = tempData[5] * 256 + tempData[4];
 		//printUSART0("%d\n", &temp);
