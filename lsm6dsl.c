@@ -149,14 +149,14 @@ bool sleepLsm6dsl(void) {
 
 	return errorFlag;
 }
-bool sleep2Lsm6dsl(void) {
+bool sleepTiltLsm6dsl(void) {
 	uint8_t tx_data[2];
 	uint8_t rx_data[2];
 	bool errorFlag = 0;
 
 	if (initializedFlag) {
 		if (serialType == LSM6DSL_SERIAL_PORT_SPI) {
-
+			
 			//Power Down gyro
 			tx_data[0] = (LSM6DSL_CTRL2_G | SPI_WRITE_DATA);
 			tx_data[1] = (0x00);
@@ -178,12 +178,20 @@ bool sleep2Lsm6dsl(void) {
 				errorFlag = 1;
 			}
 
+			//Must Clear LSM6DSL_CTRL10_C register so it can clear any existing interrupt flags
+			tx_data[0] = (LSM6DSL_CTRL10_C | SPI_WRITE_DATA);
+			tx_data[1] = 0x00;
+			if (rxtxSPI0(2, tx_data, rx_data, lsm6dslSpiCsPin)) {		//Check if SPI communication
+				errorFlag = 1;
+			}
+
+			//Enable Tilt Interrupt
 			tx_data[0] = (LSM6DSL_CTRL10_C | SPI_WRITE_DATA);
 			tx_data[1] = (LSM6DSL_TILT_EN | LSM6DSL_FUNC_EN);
 			if (rxtxSPI0(2, tx_data, rx_data, lsm6dslSpiCsPin)) {		//Check if SPI communication
 				errorFlag = 1;
 			}
-			
+
 		}
 		else {
 			errorFlag = 1;
@@ -195,7 +203,89 @@ bool sleep2Lsm6dsl(void) {
 
 	return errorFlag;
 }
-bool sleep3Lsm6dsl(void) {
+bool sleepWristTiltLsm6dsl(void) {
+	uint8_t tx_data[2];
+	uint8_t rx_data[2];
+	bool errorFlag = 0;
+
+	if (initializedFlag) {
+		if (serialType == LSM6DSL_SERIAL_PORT_SPI) {
+
+			//Power Down gyro
+			tx_data[0] = (LSM6DSL_CTRL2_G | SPI_WRITE_DATA);
+			tx_data[1] = (0x00);
+			if (rxtxSPI0(2, tx_data, rx_data, lsm6dslSpiCsPin)) {		//Check if SPI communication
+				errorFlag = 1;
+			}
+
+			//Set 26Hz Accelerometer & Set To Lowest Scale 2G
+			tx_data[0] = (LSM6DSL_CTRL1_XL | SPI_WRITE_DATA);
+			tx_data[1] = (LSM6DSL_ODR_XL_26HZ | LSM6DSL_FS_XL_2G);
+			if (rxtxSPI0(2, tx_data, rx_data, lsm6dslSpiCsPin)) {		//Check if SPI communication
+				errorFlag = 1;
+			}
+
+			//Enable AWT interupt on INT2 pin
+			tx_data[0] = (LSM6DSL_DRDY_PULSE_CFG_G | SPI_WRITE_DATA);
+			tx_data[1] = (LSM6DSL_INT2_WRIST_TILT);
+			if (rxtxSPI0(2, tx_data, rx_data, lsm6dslSpiCsPin)) {		//Check if SPI communication
+				errorFlag = 1;
+			}
+
+			//Forward All INT2 on to INT1 pin
+			tx_data[0] = (LSM6DSL_CTRL4_C | SPI_WRITE_DATA);
+			tx_data[1] = (LSM6DSL_INT2_on_INT1);
+			if (rxtxSPI0(2, tx_data, rx_data, lsm6dslSpiCsPin)) {		//Check if SPI communication
+				errorFlag = 1;
+			}
+
+			//Override Defaut AWT Values
+			tx_data[0] = (LSM6DSL_FUNC_CFG_ACCESS | SPI_WRITE_DATA);
+			tx_data[1] = (LSM6DSL_FUNC_CFG_EN | LSM6DSL_FUNC_CFG_EN_B);
+			if (rxtxSPI0(2, tx_data, rx_data, lsm6dslSpiCsPin)) {		//Check if SPI communication
+				errorFlag = 1;
+			}
+
+			//Enable AWT X & Y Axis
+			tx_data[0] = (LSM6DSL_A_WRIST_TILT_MASK | SPI_WRITE_DATA);
+			tx_data[1] = (LSM6DSL_A_WRIST_TILT_MASK_XPOS | LSM6DSL_A_WRIST_TILT_MASK_XNEG | LSM6DSL_A_WRIST_TILT_MASK_YPOS | LSM6DSL_A_WRIST_TILT_MASK_YNEG);
+			if (rxtxSPI0(2, tx_data, rx_data, lsm6dslSpiCsPin)) {		//Check if SPI communication
+				errorFlag = 1;
+			}
+
+			//Override Defaut AWT Values
+			tx_data[0] = (LSM6DSL_FUNC_CFG_ACCESS | SPI_WRITE_DATA);
+			tx_data[1] = (0x00);
+			if (rxtxSPI0(2, tx_data, rx_data, lsm6dslSpiCsPin)) {		//Check if SPI communication
+				errorFlag = 1;
+			}
+
+			//Must Clear LSM6DSL_CTRL10_C register so it can clear any existing interrupt flags
+			tx_data[0] = (LSM6DSL_CTRL10_C | SPI_WRITE_DATA);
+			tx_data[1] = 0x00;
+			if (rxtxSPI0(2, tx_data, rx_data, lsm6dslSpiCsPin)) {		//Check if SPI communication
+				errorFlag = 1;
+			}
+
+			//Enable Tilt Interrupt
+			tx_data[0] = (LSM6DSL_CTRL10_C | SPI_WRITE_DATA);
+			tx_data[1] = (LSM6DSL_WRIST_TILT_EN | LSM6DSL_FUNC_EN);
+			if (rxtxSPI0(2, tx_data, rx_data, lsm6dslSpiCsPin)) {		//Check if SPI communication
+				errorFlag = 1;
+			}
+
+		}
+		else {
+			errorFlag = 1;
+		}
+	}
+	else {
+		errorFlag = 1;
+	}
+
+	return errorFlag;
+}
+bool sleepDoubleTapLsm6dsl(void) {
 	uint8_t tx_data[2];
 	uint8_t rx_data[2];
 	bool errorFlag = 0;
@@ -249,6 +339,7 @@ bool sleep3Lsm6dsl(void) {
 
 	return errorFlag;
 }
+
 bool wakeLsm6dsl(void) {
 	uint8_t tx_data[2];
 	uint8_t rx_data[2];

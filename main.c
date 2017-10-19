@@ -583,9 +583,10 @@ void mcuSystemOff() {
 		stopTIMER2();
 
 		sleepMlx90393();
-		sleepLsm6dsl();	//Accel
-		//sleep2Lsm6dsl();	//Tilt
-		//sleep3Lsm6dsl();	//
+		//sleepLsm6dsl();	//Accel
+		//sleepTiltLsm6dsl();	//Tilt
+		//sleepDoubleTapLsm6dsl();	//Double Tap
+		sleepWristTiltLsm6dsl();	//Significant Motion
 		//sleepSPIO();
 		sleepUSART0();
 		//sleepGPIO();

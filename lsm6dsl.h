@@ -5,7 +5,9 @@
 #include <stdint.h>
 
 //LSM6DSL - ACCELEROMETER & GRYOSCOPE
-//REGISTERS
+//BANK A REGISTERS
+
+#define LSM6DSL_FUNC_CFG_ACCESS			0x01
 #define LSM6DSL_SENSOR_SYNC_TIME_FRAME	0x04
 #define LSM6DSL_SENSOR_SYNC_RES_RATIO	0x05
 
@@ -55,8 +57,11 @@
 #define LSM6DSL_OUTZ_L_XL				0x2C
 #define LSM6DSL_OUTZ_H_XL				0x2D
 
-
+#define LSM6DSL_A_WRIST_TILT_LAT		0x50
 #define LSM6DSL_FUNC_SRC1				0x53
+#define LSM6DSL_FUNC_SRC2				0x54
+#define LSM6DSL_WRIST_TILT_IA			0x55
+
 #define LSM6DSL_TAP_CFG					0x58
 #define LSM6DSL_TAP_THS_6D				0x59
 #define LSM6DSL_WAKE_UP_THS				0x5B
@@ -68,11 +73,32 @@
 #define LSM6DSL_Y_OFS_USR				0x74
 #define LSM6DSL_Z_OFS_USR				0x75
 
+//BANK B Registers
+
+#define LSM6DSL_A_WRIST_TILT_LAT		0x50
+#define LSM6DSL_A_WRIST_TILT_THS		0x54
+#define LSM6DSL_A_WRIST_TILT_MASK		0x59
+
+
+
 //VALUES
 #define LSM6DSL_WHO_AM_I_VALUE			0x6A
 
-//LSM6DSL_CTRL3_C	PARAMETERS
-#define LSM6DSL_SW_RESET				0x01
+//LSM6DSL_A_WRIST_TILT_MASK	PARAMETERS
+#define LSM6DSL_A_WRIST_TILT_MASK_XPOS	0x80
+#define LSM6DSL_A_WRIST_TILT_MASK_XNEG	0x40
+#define LSM6DSL_A_WRIST_TILT_MASK_YPOS	0x20
+#define LSM6DSL_A_WRIST_TILT_MASK_YNEG	0x10
+#define LSM6DSL_A_WRIST_TILT_MASK_ZPOS	0x08
+#define LSM6DSL_A_WRIST_TILT_MASK_ZNEG	0x04
+
+
+//LSM6DSL_FUNC_CFG_ACCESS	PARAMETERS
+#define LSM6DSL_FUNC_CFG_EN				0x80
+#define LSM6DSL_FUNC_CFG_EN_B			0x20
+
+//LSM6DSL_DRDY_PULSE_CFG_G	PARAMETERS
+#define LSM6DSL_INT2_WRIST_TILT			0x01
 
 //LSM6DSL_TAP_CFG	PARAMETERS
 #define LSM6DSL_INTERRUPTS_ENABLE		0x80
@@ -125,7 +151,8 @@
 #define LSM6DSL_INT1_TILT				0x02	//Route tilt interrupt to INT1
 
 
-
+//LSM6DSL_INT1_CTRL		PARAMETERS
+#define LSM6DSL_INT1_SIGN_MOT			0x40
 
 //LSM6DSL_CTRL1_XL	PARAMETERS
 #define LSM6DSL_ODR_XL_POWER_DOWN		0x00
@@ -170,8 +197,12 @@
 #define LSM6DSL_FS_G_1000DPS			0x08	//35 mdps/LSB
 #define LSM6DSL_FS_G_2000DPS			0x0C	//70 mdps/LSB	/ High power mode noise 4 mdps/Hz
 
+//LSM6DSL_CTRL3_C	PARAMETERS
+#define LSM6DSL_SW_RESET				0x01
+
 //LSM6DSL_CTRL4_C	PARAMETERS
 #define LSM6DSL_SLEEP					0x40
+#define LSM6DSL_INT2_on_INT1			0x20
 #define LSM6DSL_LPF1_SEL_G				0x02
 
 //LSM6DSL_CTRL6_C	PARAMETERS
@@ -210,8 +241,9 @@
 
 bool initLsm6dsl(uint8_t , uint8_t );
 bool sleepLsm6dsl(void);
-bool sleep2Lsm6dsl(void);
-bool sleep3Lsm6dsl(void);
+bool sleepTiltLsm6dsl(void);
+bool sleepDoubleTapLsm6dsl(void);
+bool sleepWristTiltLsm6dsl(void);
 bool wakeLsm6dsl(void);
 
 bool getLsm6dslAccelData(uint8_t* );
