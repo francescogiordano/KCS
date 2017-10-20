@@ -260,12 +260,14 @@ bool sleepWristTiltLsm6dsl(void) {
 				errorFlag = 1;
 			}
 
+			/*
 			//Must Clear LSM6DSL_CTRL10_C register so it can clear any existing interrupt flags
 			tx_data[0] = (LSM6DSL_CTRL10_C | SPI_WRITE_DATA);
 			tx_data[1] = 0x00;
 			if (rxtxSPI0(2, tx_data, rx_data, lsm6dslSpiCsPin)) {		//Check if SPI communication
 				errorFlag = 1;
 			}
+			*/
 
 			//Enable Tilt Interrupt
 			tx_data[0] = (LSM6DSL_CTRL10_C | SPI_WRITE_DATA);
