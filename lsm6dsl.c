@@ -138,6 +138,16 @@ bool sleepLsm6dsl(void) {
 			if (rxtxSPI0(2, tx_data, rx_data, lsm6dslSpiCsPin)) {		//Check if SPI communication
 				errorFlag = 1;
 			}
+
+			//Confirm if device is functionally
+			tx_data[0] = (LSM6DSL_WHO_AM_I | SPI_READ_DATA);
+			tx_data[1] = 0x00;
+			if (rxtxSPI0(2, tx_data, rx_data, lsm6dslSpiCsPin)) {		//Check if SPI communication
+				errorFlag = 1;
+			}
+			if (rx_data[1] != LSM6DSL_WHO_AM_I_VALUE) {		//Check if SPI Chip Valid
+				errorFlag = 1;
+			}
 		}
 		else {
 			errorFlag = 1;
@@ -189,6 +199,16 @@ bool sleepTiltLsm6dsl(void) {
 			tx_data[0] = (LSM6DSL_CTRL10_C | SPI_WRITE_DATA);
 			tx_data[1] = (LSM6DSL_TILT_EN | LSM6DSL_FUNC_EN);
 			if (rxtxSPI0(2, tx_data, rx_data, lsm6dslSpiCsPin)) {		//Check if SPI communication
+				errorFlag = 1;
+			}
+
+			//Confirm if device is functionally
+			tx_data[0] = (LSM6DSL_WHO_AM_I | SPI_READ_DATA);
+			tx_data[1] = 0x00;
+			if (rxtxSPI0(2, tx_data, rx_data, lsm6dslSpiCsPin)) {		//Check if SPI communication
+				errorFlag = 1;
+			}
+			if (rx_data[1] != LSM6DSL_WHO_AM_I_VALUE) {		//Check if SPI Chip Valid
 				errorFlag = 1;
 			}
 
@@ -276,6 +296,15 @@ bool sleepWristTiltLsm6dsl(void) {
 				errorFlag = 1;
 			}
 
+			//Confirm if device is functionally
+			tx_data[0] = (LSM6DSL_WHO_AM_I | SPI_READ_DATA);
+			tx_data[1] = 0x00;
+			if (rxtxSPI0(2, tx_data, rx_data, lsm6dslSpiCsPin)) {		//Check if SPI communication
+				errorFlag = 1;
+			}
+			if (rx_data[1] != LSM6DSL_WHO_AM_I_VALUE) {		//Check if SPI Chip Valid
+				errorFlag = 1;
+			}
 		}
 		else {
 			errorFlag = 1;
@@ -327,6 +356,16 @@ bool sleepDoubleTapLsm6dsl(void) {
 			tx_data[0] = (LSM6DSL_TAP_CFG | SPI_WRITE_DATA);
 			tx_data[1] = (LSM6DSL_INTERRUPTS_ENABLE | LSM6DSL_INACT_EN_3 | LSM6DSL_TAP_Z_EN);
 			if (rxtxSPI0(2, tx_data, rx_data, lsm6dslSpiCsPin)) {		//Check if SPI communication
+				errorFlag = 1;
+			}
+
+			//Confirm if device is functionally
+			tx_data[0] = (LSM6DSL_WHO_AM_I | SPI_READ_DATA);
+			tx_data[1] = 0x00;
+			if (rxtxSPI0(2, tx_data, rx_data, lsm6dslSpiCsPin)) {		//Check if SPI communication
+				errorFlag = 1;
+			}
+			if (rx_data[1] != LSM6DSL_WHO_AM_I_VALUE) {		//Check if SPI Chip Valid
 				errorFlag = 1;
 			}
 			

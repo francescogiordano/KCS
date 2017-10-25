@@ -114,52 +114,52 @@
 
 //#define DEVICE_NAME                         "PaulTheBest"
 //#define DEVICE_NAME                         "Francesco"
-#define DEVICE_NAME							"Klutch Curling Sensor"					/**< Name of device. Will be included in the advertising data. */
+#define DEVICE_NAME							"Klutch Curling Sensor"						/**< Name of device. Will be included in the advertising data. */
 #define DEVICE_FIRMWARE_VERSION_MAJOR		0x01
 #define DEVICE_FIRMWARE_VERSION_MINOR		0x03
-#define DEVICE_FIRMWARE_VERSION_REVISION	0x00
-#define MANUFACTURER_NAME                   "nRF51822"                     			/**< Manufacturer. Will be passed to Device Information Service. */
-#define APP_ADV_INTERVAL                    64                                         /**< The advertising interval (in units of 0.625 ms. This value corresponds to 25 ms). */
-#define APP_ADV_TIMEOUT_180_SECONDS         180                                        /**< The advertising timeout in units of seconds. */
-#define APP_ADV_TIMEOUT_10_SECONDS	        10                                        /**< The advertising timeout in units of seconds. */
+#define DEVICE_FIRMWARE_VERSION_REVISION	0x01
+#define MANUFACTURER_NAME                   "nRF51822"                     				/**< Manufacturer. Will be passed to Device Information Service. */
+#define APP_ADV_INTERVAL                    64											/**< The advertising interval (in units of 0.625 ms. This value corresponds to 25 ms). */
+#define APP_ADV_TIMEOUT_180_SECONDS         180											/**< The advertising timeout in units of seconds. */
+#define APP_ADV_TIMEOUT_10_SECONDS	        10											/**< The advertising timeout in units of seconds. */
 
-#define APP_TIMER_PRESCALER                 0                                          /**< Value of the RTC1 PRESCALER register. */
-#define APP_TIMER_MAX_TIMERS                1                                          /**< Maximum number of simultaneously created timers. */
-#define APP_TIMER_OP_QUEUE_SIZE             1                                          /**< Size of timer operation queues. */
+#define APP_TIMER_PRESCALER                 0											/**< Value of the RTC1 PRESCALER register. */
+#define APP_TIMER_MAX_TIMERS                1											/**< Maximum number of simultaneously created timers. */
+#define APP_TIMER_OP_QUEUE_SIZE             1											/**< Size of timer operation queues. */
 
-#define MIN_CONN_INTERVAL                   MSEC_TO_UNITS(7.5, UNIT_1_25_MS)           /**< Minimum acceptable connection interval (0.5 seconds). */
-#define MAX_CONN_INTERVAL                   MSEC_TO_UNITS(10, UNIT_1_25_MS)            /**< Maximum acceptable connection interval (1 second). */
+#define MIN_CONN_INTERVAL                   MSEC_TO_UNITS(7.5, UNIT_1_25_MS)			/**< Minimum acceptable connection interval (0.5 seconds). */
+#define MAX_CONN_INTERVAL                   MSEC_TO_UNITS(10, UNIT_1_25_MS)				/**< Maximum acceptable connection interval (1 second). */
 
-#define SLAVE_LATENCY                       0                                          /**< Slave latency. */
+#define SLAVE_LATENCY                       0											/**< Slave latency. */
 #define CONN_SUP_TIMEOUT                    MSEC_TO_UNITS(300, UNIT_10_MS)				/**< Connection supervisory timeout (4 seconds). */
 
 #define FIRST_CONN_PARAMS_UPDATE_DELAY      APP_TIMER_TICKS(500, APP_TIMER_PRESCALER)	/**< Time from initiating event (connect or start of notification) to first time sd_ble_gap_conn_param_update is called (5 seconds). */
 #define NEXT_CONN_PARAMS_UPDATE_DELAY       APP_TIMER_TICKS(500, APP_TIMER_PRESCALER)	/**< Time between each call to sd_ble_gap_conn_param_update after the first call (30 seconds). */
-#define MAX_CONN_PARAMS_UPDATE_COUNT        3                                          /**< Number of attempts before giving up the connection parameter negotiation. */
+#define MAX_CONN_PARAMS_UPDATE_COUNT        3											/**< Number of attempts before giving up the connection parameter negotiation. */
 
-#define SEC_PARAM_TIMEOUT                   30                                         /**< Timeout for Pairing Request or Security Request (in seconds). */
-#define SEC_PARAM_BOND                      1                                          /**< Perform bonding. */
-#define SEC_PARAM_MITM                      0                                          /**< Man In The Middle protection not required. */
-#define SEC_PARAM_IO_CAPABILITIES           BLE_GAP_IO_CAPS_NONE                       /**< No I/O capabilities. */
-#define SEC_PARAM_OOB                       0                                          /**< Out Of Band data not available. */
-#define SEC_PARAM_MIN_KEY_SIZE              7                                          /**< Minimum encryption key size. */
-#define SEC_PARAM_MAX_KEY_SIZE              16                                         /**< Maximum encryption key size. */
+#define SEC_PARAM_TIMEOUT                   30											/**< Timeout for Pairing Request or Security Request (in seconds). */
+#define SEC_PARAM_BOND                      1											/**< Perform bonding. */
+#define SEC_PARAM_MITM                      0											/**< Man In The Middle protection not required. */
+#define SEC_PARAM_IO_CAPABILITIES           BLE_GAP_IO_CAPS_NONE						/**< No I/O capabilities. */
+#define SEC_PARAM_OOB                       0											/**< Out Of Band data not available. */
+#define SEC_PARAM_MIN_KEY_SIZE              7											/**< Minimum encryption key size. */
+#define SEC_PARAM_MAX_KEY_SIZE              16											/**< Maximum encryption key size. */
 
-#define DEAD_BEEF                           0xDEADBEEF                                 /**< Value used as error code on stack dump, can be used to identify stack location on stack unwind. */
+#define DEAD_BEEF                           0xDEADBEEF									/**< Value used as error code on stack dump, can be used to identify stack location on stack unwind. */
 
-#define DFU_REV_MAJOR						0x00                                       /** DFU Major revision number to be exposed. */
-#define DFU_REV_MINOR						0x01                                       /** DFU Minor revision number to be exposed. */
-#define DFU_REVISION						((DFU_REV_MAJOR << 8) | DFU_REV_MINOR)     /** DFU Revision number to be exposed. Combined of major and minor versions. */
-#define APP_SERVICE_HANDLE_START			0x000C                                     /**< Handle of first application specific service when when service changed characteristic is present. */
-#define BLE_HANDLE_MAX						0xFFFF                                     /**< Max handle value in BLE. */
+#define DFU_REV_MAJOR						0x00										/** DFU Major revision number to be exposed. */
+#define DFU_REV_MINOR						0x01										/** DFU Minor revision number to be exposed. */
+#define DFU_REVISION						((DFU_REV_MAJOR << 8) | DFU_REV_MINOR)		/** DFU Revision number to be exposed. Combined of major and minor versions. */
+#define APP_SERVICE_HANDLE_START			0x000C										/**< Handle of first application specific service when when service changed characteristic is present. */
+#define BLE_HANDLE_MAX						0xFFFF										/**< Max handle value in BLE. */
 
-static uint16_t                             m_conn_handle = BLE_CONN_HANDLE_INVALID;   /**< Handle of the current connection. */
-static ble_gap_sec_params_t                 m_sec_params;                              /**< Security requirements for this application. */
+static uint16_t                             m_conn_handle = BLE_CONN_HANDLE_INVALID;	/**< Handle of the current connection. */
+static ble_gap_sec_params_t                 m_sec_params;								/**< Security requirements for this application. */
 //static ble_gap_adv_params_t                 m_adv_params;                              /**< Parameters to be passed to the stack when starting advertising. */
 static ble_pss_t                            m_pss;
 
-static ble_dfu_t							m_dfus;                                    /**< Structure used to identify the DFU service. */
-static dm_application_instance_t			m_app_handle;                              /**< Application identifier allocated by device manager */
+static ble_dfu_t							m_dfus;										/**< Structure used to identify the DFU service. */
+static dm_application_instance_t			m_app_handle;								/**< Application identifier allocated by device manager */
 
 volatile uint8_t CharDiagInfoData[6];
 volatile uint8_t CharFirmVerData[3] = { DEVICE_FIRMWARE_VERSION_MAJOR, DEVICE_FIRMWARE_VERSION_MINOR, DEVICE_FIRMWARE_VERSION_REVISION };
@@ -583,16 +583,29 @@ void mcuSystemOff() {
 		stopTIMER2();
 
 		sleepMlx90393();
-		//sleepLsm6dsl();	//Accel
-		//sleepTiltLsm6dsl();	//Tilt
-		//sleepDoubleTapLsm6dsl();	//Double Tap
-		sleepWristTiltLsm6dsl();	//Wrist Tilt
+		/*
+		if (sleepLsm6dsl() == 1) {		//Accel Wake-Up
+		NVIC_SystemReset();
+		}
+		*/
+		/*
+		if (sleepTiltLsm6dsl() == 1) {		//Tilt Wake-Up
+		NVIC_SystemReset();
+		}
+		*/
+		/*
+		if (sleepDoubleTapLsm6dsl() == 1) {		//Double Tap Wake-Up
+			NVIC_SystemReset();
+		}
+		*/
+		if (sleepWristTiltLsm6dsl() == 1){		//Wrist Tilt Wake-Up
+			NVIC_SystemReset();
+		}
 		//sleepSPIO();
+		printUSART0("Power Down\n", 0);
 		sleepUSART0();
 		//sleepGPIO();
-		//NRF_ADC->CONFIG = 0;
-
-		printUSART0("Power Down\n", 0);
+		//NRF_ADC->CONFIG = 0;		
 
 		APP_ERROR_CHECK(sd_power_system_off());
 	}
