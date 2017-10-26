@@ -266,6 +266,13 @@ bool sleepWristTiltLsm6dsl(void) {
 				errorFlag = 1;
 			}
 
+			//Set Wrist Tilt Latency to 120 ms
+			tx_data[0] = (LSM6DSL_A_WRIST_TILT_LAT | SPI_WRITE_DATA);
+			tx_data[1] = (LSM6DSL_A_WRIST_TILT_LAT_120ms);
+			if (rxtxSPI0(2, tx_data, rx_data, lsm6dslSpiCsPin)) {		//Check if SPI communication
+				errorFlag = 1;
+			}
+
 			//Enable AWT X & Y Axis
 			tx_data[0] = (LSM6DSL_A_WRIST_TILT_MASK | SPI_WRITE_DATA);
 			tx_data[1] = (LSM6DSL_A_WRIST_TILT_MASK_XPOS | LSM6DSL_A_WRIST_TILT_MASK_XNEG | LSM6DSL_A_WRIST_TILT_MASK_YPOS | LSM6DSL_A_WRIST_TILT_MASK_YNEG);

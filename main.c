@@ -117,7 +117,7 @@
 #define DEVICE_NAME							"Klutch Curling Sensor"						/**< Name of device. Will be included in the advertising data. */
 #define DEVICE_FIRMWARE_VERSION_MAJOR		0x01
 #define DEVICE_FIRMWARE_VERSION_MINOR		0x03
-#define DEVICE_FIRMWARE_VERSION_REVISION	0x01
+#define DEVICE_FIRMWARE_VERSION_REVISION	0x02
 #define MANUFACTURER_NAME                   "nRF51822"                     				/**< Manufacturer. Will be passed to Device Information Service. */
 #define APP_ADV_INTERVAL                    64											/**< The advertising interval (in units of 0.625 ms. This value corresponds to 25 ms). */
 #define APP_ADV_TIMEOUT_180_SECONDS         180											/**< The advertising timeout in units of seconds. */
