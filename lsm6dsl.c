@@ -53,7 +53,7 @@ bool initLsm6dsl(uint8_t type, uint8_t spiCsPin) {
 			errorFlag = 1;
 		}
 
-		//Set 416Hz Gyroscope & Set To Scale 2000dps - 4.375 mdps/LSB - Normal/Low power mode noise 75 mdps
+		//Set 416Hz Gyroscope & Set To Scale 1000dps - 35 mdps/LSB
 		tx_data[0] = (LSM6DSL_CTRL2_G | SPI_WRITE_DATA);
 		tx_data[1] = (LSM6DSL_ODR_G_416HZ | LSM6DSL_FS_G_1000DPS);
 		if (rxtxSPI0(2, tx_data, rx_data, lsm6dslSpiCsPin)) {		//Check if SPI communication
